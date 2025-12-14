@@ -91,6 +91,10 @@
     box-shadow: 2px 2px 4px var(--shadow-dark), -2px -2px 4px var(--shadow-light);
     transition: all 0.2s ease;
     border: 1px solid transparent;
+    /* 确保按钮在移动端可点击 */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
   }
 
   .soft-button:hover {

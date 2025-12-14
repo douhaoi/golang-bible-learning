@@ -15,9 +15,10 @@ const currentChapterId = currentSectionId.split('.')[0] || '';
 <>
   <button
     type="button"
-    class="lg:hidden fixed top-20 left-4 z-50 soft-button p-3 rounded-lg"
-    style="color: var(--text-primary);"
+    class="lg:hidden fixed top-20 left-4 z-[60] soft-button p-3 rounded-lg touch-manipulation"
+    style="color: var(--text-primary); cursor: pointer;"
     aria-label="切换导航菜单"
+    aria-expanded="false"
     data-section-nav-toggle
   >
     <LucideIcon name="menu" class="h-5 w-5" data-section-nav-icon-open />
@@ -25,7 +26,7 @@ const currentChapterId = currentSectionId.split('.')[0] || '';
   </button>
 
   <div
-    class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30 hidden"
+    class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-[55] hidden"
     role="button"
     tabindex="0"
     aria-label="关闭导航"
@@ -33,10 +34,10 @@ const currentChapterId = currentSectionId.split('.')[0] || '';
   />
 
   <aside
-    class="fixed lg:sticky top-0 left-0 h-screen z-40 w-80 lg:w-72 xl:w-80 transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0"
+    class="fixed lg:sticky top-0 left-0 h-screen z-[60] w-80 lg:w-72 xl:w-80 transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0"
     data-section-nav-aside
   >
-    <nav class="h-full soft-card p-4 overflow-y-auto">
+    <nav class="h-full soft-card p-4 overflow-y-auto" data-section-nav-content>
       <div class="mb-4 px-2">
         <h2 class="text-base font-bold" style="color: var(--text-primary);">Go语言圣经</h2>
         <p class="text-xs mt-1" style="color: var(--text-secondary);">全部章节</p>
@@ -120,59 +121,100 @@ const currentChapterId = currentSectionId.split('.')[0] || '';
     </nav>
   </aside>
 
-  <script is:inline>
+  <script>
     (function () {
-      const toggle = document.querySelector('[data-section-nav-toggle]');
-      const aside = document.querySelector('[data-section-nav-aside]');
-      const overlay = document.querySelector('[data-section-nav-overlay]');
-      const iconOpen = document.querySelector('[data-section-nav-icon-open]');
-      const iconClose = document.querySelector('[data-section-nav-icon-close]');
+      function initNav() {
+        const toggle = document.querySelector('[data-section-nav-toggle]');
+        const aside = document.querySelector('[data-section-nav-aside]');
+        const overlay = document.querySelector('[data-section-nav-overlay]');
+        const iconOpen = document.querySelector('[data-section-nav-icon-open]');
+        const iconClose = document.querySelector('[data-section-nav-icon-close]');
 
-      const setOpen = (open) => {
-        if (!aside || !overlay || !iconOpen || !iconClose) return;
-        aside.classList.toggle('-translate-x-full', !open);
-        aside.classList.toggle('translate-x-0', open);
-        overlay.classList.toggle('hidden', !open);
-        iconOpen.classList.toggle('hidden', open);
-        iconClose.classList.toggle('hidden', !open);
-      };
+        if (!toggle || !aside || !overlay || !iconOpen || !iconClose) {
+          return;
+        }
 
-      if (toggle) {
-        toggle.addEventListener('click', () => {
-          const isOpen = aside && aside.classList.contains('translate-x-0');
+        let isOpen = false;
+
+        const setOpen = (open) => {
+          isOpen = open;
+          if (open) {
+            aside.classList.remove('-translate-x-full');
+            aside.classList.add('translate-x-0');
+            overlay.classList.remove('hidden');
+            iconOpen.classList.add('hidden');
+            iconClose.classList.remove('hidden');
+            toggle.setAttribute('aria-expanded', 'true');
+            document.body.style.overflow = 'hidden';
+          } else {
+            aside.classList.add('-translate-x-full');
+            aside.classList.remove('translate-x-0');
+            overlay.classList.add('hidden');
+            iconOpen.classList.remove('hidden');
+            iconClose.classList.add('hidden');
+            toggle.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+          }
+        };
+
+        toggle.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
           setOpen(!isOpen);
         });
-      }
 
-      if (overlay) {
-        overlay.addEventListener('click', () => setOpen(false));
+        // 阻止点击导航内容时关闭菜单
+        const navContent = document.querySelector('[data-section-nav-content]');
+        if (navContent) {
+          navContent.addEventListener('click', (e) => {
+            e.stopPropagation();
+          });
+        }
+
+        overlay.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setOpen(false);
+        });
         overlay.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setOpen(false);
+          }
+        });
+
+        document.addEventListener('keydown', (e) => {
           if (e.key === 'Escape') setOpen(false);
         });
+
+        document.querySelectorAll('[data-section-link]').forEach((el) => {
+          el.addEventListener('click', () => setOpen(false));
+        });
+
+        document.querySelectorAll('[data-chapter-toggle]').forEach((button) => {
+          button.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const chapterId = button.getAttribute('data-chapter-toggle');
+            if (!chapterId) return;
+            const list = document.querySelector(`[data-chapter-sections="${chapterId}"]`);
+            if (!list) return;
+            const expanded = !list.classList.contains('hidden');
+            list.classList.toggle('hidden', expanded);
+            button.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+
+            const chevron = button.querySelector('svg');
+            if (chevron) chevron.classList.toggle('rotate-180', !expanded);
+          });
+        });
       }
 
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') setOpen(false);
-      });
-
-      document.querySelectorAll('[data-section-link]').forEach((el) => {
-        el.addEventListener('click', () => setOpen(false));
-      });
-
-      document.querySelectorAll('[data-chapter-toggle]').forEach((button) => {
-        button.addEventListener('click', () => {
-          const chapterId = button.getAttribute('data-chapter-toggle');
-          if (!chapterId) return;
-          const list = document.querySelector(`[data-chapter-sections="${chapterId}"]`);
-          if (!list) return;
-          const expanded = !list.classList.contains('hidden');
-          list.classList.toggle('hidden', expanded);
-          button.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-
-          const chevron = button.querySelector('svg');
-          if (chevron) chevron.classList.toggle('rotate-180', !expanded);
-        });
-      });
+      // 确保 DOM 加载完成后初始化
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initNav);
+      } else {
+        // 使用 setTimeout 确保所有元素都已渲染
+        setTimeout(initNav, 0);
+      }
     })();
   </script>
 </>
