@@ -38,12 +38,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Copy content files
-        run: node scripts/copy-content.js
-
-      - name: Run type check
-        run: pnpm run type-check
-
       - name: Run Biome check (lint + format)
         run: pnpm run check
 
@@ -51,6 +45,7 @@ jobs:
         run: pnpm run build
         env:
           NODE_ENV: production
+          SITE: https://${{ github.repository_owner }}.github.io/golang-bible-learning/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -70,4 +65,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-

@@ -1,0 +1,146 @@
+---
+import LucideIcon from '../components/LucideIcon.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getChaptersFromContent } from '../lib/contentChapters';
+import { chapterUrl } from '../lib/urls';
+
+const chapters = await getChaptersFromContent();
+const totalSections = chapters.reduce((sum, ch) => sum + ch.sections.length, 0);
+---
+
+<BaseLayout
+  title="Go语言圣经"
+  description="一个现代化的Go语言学习平台，基于《Go语言圣经》构建，帮助你系统学习Go语言编程"
+>
+  <div class="space-y-12">
+    <div class="text-center">
+      <div class="soft-card p-8 md:p-12 mb-8">
+        <h1 class="text-5xl md:text-6xl font-bold mb-4" style="color: var(--accent);">
+          Go语言圣经
+        </h1>
+        <p class="text-xl md:text-2xl mb-2 font-light" style="color: var(--text-secondary);">
+          The Go Programming Language
+        </p>
+        <p class="text-lg max-w-2xl mx-auto" style="color: var(--text-secondary);">
+          一个现代化的Go语言学习平台，基于《Go语言圣经》构建，帮助你系统学习Go语言编程
+        </p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {[
+        { icon: 'book-open', value: chapters.length, label: '章节' },
+        { icon: 'code', value: totalSections, label: '小节' },
+        { icon: 'zap', value: '100%', label: '免费' },
+      ].map((stat) => (
+        <div class="soft-card p-6">
+          <div class="flex items-center space-x-4">
+            <div class="soft-raised p-3 rounded-xl">
+              <LucideIcon name={stat.icon as any} class="h-8 w-8" style="color: var(--accent);" />
+            </div>
+            <div>
+              <div class="text-3xl font-bold" style="color: var(--accent);">{stat.value}</div>
+              <div class="text-sm" style="color: var(--text-secondary);">{stat.label}</div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div class="soft-card p-8 md:p-10">
+      <div class="flex items-center space-x-2 mb-6">
+        <div class="soft-raised p-2 rounded-lg">
+          <LucideIcon name="sparkles" class="h-6 w-6" style="color: var(--accent);" />
+        </div>
+        <h2 class="text-3xl font-bold" style="color: var(--text-primary);">学习特色</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {[
+          {
+            icon: 'book-open',
+            title: '系统化学习',
+            desc: '从基础到高级，14个章节循序渐进，全面覆盖Go语言核心知识点',
+          },
+          { icon: 'code', title: '实践导向', desc: '每个章节都包含丰富的示例代码和实际应用场景' },
+          {
+            icon: 'zap',
+            title: '现代化界面',
+            desc: '清晰美观的阅读体验，支持响应式设计，随时随地学习',
+          },
+          {
+            icon: 'users',
+            title: '开源免费',
+            desc: '完全开源，基于Go语言圣经中文版，仅供学习交流使用',
+          },
+        ].map((feature) => (
+          <div class="soft-raised p-5 rounded-xl">
+            <div class="flex items-start space-x-4">
+              <div class="soft-inset p-2 rounded-lg flex-shrink-0">
+                <LucideIcon
+                  name={feature.icon as any}
+                  class="h-6 w-6"
+                  style="color: var(--accent);"
+                />
+              </div>
+              <div>
+                <h3 class="font-semibold mb-2" style="color: var(--text-primary);">
+                  {feature.title}
+                </h3>
+                <p class="text-sm leading-relaxed" style="color: var(--text-secondary);">
+                  {feature.desc}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="soft-card p-8 md:p-12 text-center">
+      <h2 class="text-3xl font-bold mb-4" style="color: var(--text-primary);">开始学习</h2>
+      <p class="mb-8 text-lg" style="color: var(--text-secondary);">
+        准备好开始你的Go语言学习之旅了吗？点击下方按钮查看所有章节
+      </p>
+      <a
+        href="chapters/"
+        class="soft-button inline-flex items-center space-x-2 px-8 py-4 rounded-xl font-semibold"
+        style="color: var(--accent);"
+      >
+        <span>查看所有章节</span>
+        <LucideIcon name="zap" class="h-5 w-5" />
+      </a>
+    </div>
+
+    <div class="soft-card p-8 md:p-10">
+      <h2 class="text-3xl font-bold mb-6" style="color: var(--text-primary);">章节预览</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {chapters.slice(0, 6).map((chapter) => (
+          <a
+            href={chapterUrl(chapter.id)}
+            class="soft-raised p-5 rounded-xl block"
+          >
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-sm font-medium" style="color: var(--accent);">
+                第 {chapter.id} 章
+              </span>
+              <span class="text-xs soft-inset px-2 py-1 rounded" style="color: var(--text-secondary);">
+                {chapter.sections.length} 小节
+              </span>
+            </div>
+            <h3 class="font-semibold" style="color: var(--text-primary);">{chapter.title}</h3>
+          </a>
+        ))}
+      </div>
+      <div class="mt-8 text-center">
+        <a
+          href="chapters/"
+          class="inline-flex items-center space-x-2 font-medium"
+          style="color: var(--accent);"
+        >
+          <span>查看全部章节</span>
+          <LucideIcon name="chevron-right" class="h-4 w-4" />
+        </a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

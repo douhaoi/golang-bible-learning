@@ -3,6 +3,7 @@ export default {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
+    "./astro-src/**/*.{astro,html,js,ts,jsx,tsx,md,mdx}",
   ],
   theme: {
     extend: {
@@ -73,4 +74,3 @@ export default {
   },
   plugins: [],
 }
-

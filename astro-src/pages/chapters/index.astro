@@ -1,0 +1,41 @@
+---
+import LucideIcon from '../../components/LucideIcon.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getChaptersFromContent } from '../../lib/contentChapters';
+import { chapterUrl } from '../../lib/urls';
+
+const chapters = await getChaptersFromContent();
+---
+
+<BaseLayout title="所有章节 - Go语言圣经" description="选择章节开始学习，共 14 个章节。">
+  <div>
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold mb-2" style="color: var(--text-primary);">所有章节</h1>
+      <p style="color: var(--text-secondary);">选择章节开始学习，共 {chapters.length} 个章节</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+      {chapters.map((chapter) => (
+        <a href={chapterUrl(chapter.id)} class="soft-card p-6 block">
+          <div class="flex items-start justify-between mb-4">
+            <div class="flex items-center space-x-3">
+              <div class="soft-raised p-3 rounded-lg">
+                <LucideIcon name="book-open" class="h-6 w-6" style="color: var(--accent);" />
+              </div>
+              <div>
+                <div class="text-sm font-medium" style="color: var(--accent);">第 {chapter.id} 章</div>
+                <h2 class="text-xl font-bold mt-1" style="color: var(--text-primary);">
+                  {chapter.title}
+                </h2>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span style="color: var(--text-secondary);">{chapter.sections.length} 个小节</span>
+            <LucideIcon name="chevron-right" class="h-4 w-4" style="color: var(--text-secondary);" />
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
