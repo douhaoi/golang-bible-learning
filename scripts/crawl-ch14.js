@@ -105,10 +105,20 @@ async function fetchSection(sectionId, url) {
 // 保存内容到文件
 async function saveContent(sectionId, data) {
   try {
-    const fileName = `${sectionId.replace(/\./g, '-')}.md`;
-    const filePath = join(OUTPUT_DIR, fileName);
+    // 解析章节号和小节号 (例如: 14.1 -> chapter: 14, section: 01)
+    const [chapterNum, sectionNum] = sectionId.split('.');
+    const chapterDir = `ch${chapterNum}`;
+    const sectionPadded = sectionNum.padStart(2, '0');
+    const fileName = `ch${chapterNum}-${sectionPadded}.md`;
+    
+    // 创建章节文件夹
+    const chapterPath = join(OUTPUT_DIR, chapterDir);
+    await mkdir(chapterPath, { recursive: true });
+    
+    // 保存文件
+    const filePath = join(chapterPath, fileName);
     await writeFile(filePath, `# ${data.title}\n\n${data.content}\n`, 'utf-8');
-    console.log(`✓ 已保存: ${fileName}`);
+    console.log(`✓ 已保存: ${chapterDir}/${fileName}`);
   } catch (error) {
     console.error(`保存失败 ${sectionId}:`, error.message);
   }
