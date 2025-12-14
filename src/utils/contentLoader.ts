@@ -6,6 +6,21 @@ export interface SectionContent {
   content: string;
 }
 
+function normalizeMarkdownContent(markdown: string): string {
+  // 将相邻“纯图片段落”合并为同一个段落，便于页面把多张图片（如章节底部二维码）排成同一行。
+  // 典型输入：
+  // ![](a)
+  //
+  // ![](b)
+  // 输出（去掉空行）：
+  // ![](a)
+  // ![](b)
+  return markdown.replace(
+    /(^!\[[^\]]*\]\([^)]+\)\s*)\n(?:[ \t]*\n)+(?=!\[[^\]]*\]\([^)]+\))/gm,
+    '$1\n'
+  );
+}
+
 // 动态导入Markdown内容
 export async function loadSectionContent(sectionId: string): Promise<SectionContent | null> {
   // 将 sectionId 转换为文件名格式 (例如: 1.1 -> 1-1)
@@ -23,7 +38,7 @@ export async function loadSectionContent(sectionId: string): Promise<SectionCont
     // 解析Markdown内容
     const lines = content.split('\n');
     const title = lines[0].replace(/^#+\s*/, '') || sectionId;
-    const body = lines.slice(1).join('\n').trim();
+    const body = normalizeMarkdownContent(lines.slice(1).join('\n').trim());
     
     return {
       sectionId,
@@ -39,7 +54,7 @@ export async function loadSectionContent(sectionId: string): Promise<SectionCont
       
       const lines = content.split('\n');
       const title = lines[0].replace(/^#+\s*/, '') || sectionId;
-      const body = lines.slice(1).join('\n').trim();
+      const body = normalizeMarkdownContent(lines.slice(1).join('\n').trim());
       
       return {
         sectionId,
