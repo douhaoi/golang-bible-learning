@@ -33,22 +33,57 @@ function normalizeMarkdownContent(markdown: string): string {
 
 // 动态导入Markdown内容
 export async function loadSectionContent(sectionId: string): Promise<SectionContent | null> {
-  // 将 sectionId 转换为文件名格式 (例如: 1.1 -> 1-1)
-  const fileName = sectionId.replace(/\./g, '-');
+  // 将 sectionId 转换为路径格式
+  // 例如: 1.1 -> ch1/ch1-01.md
+  const [chapterNum, sectionNum] = sectionId.split('.');
+  const fileName = `ch${chapterNum}-${sectionNum.padStart(2, '0')}.md`;
+  const filePath = `ch${chapterNum}/${fileName}`;
 
+  // 开发环境：使用 Vite 的 import.meta.glob 预定义导入
+  // 生产环境：使用 fetch（从 dist/content 加载）
+  if (import.meta.env.DEV) {
+    try {
+      // Vite 要求 glob 模式必须是静态字符串
+      // 所以我们预先定义所有可能的导入路径
+      const contentModules = import.meta.glob('../content/ch*/*.md', { 
+        query: '?raw',
+        import: 'default',
+      });
+      
+      const modulePath = `../content/${filePath}`;
+      const loadModule = contentModules[modulePath];
+      
+      if (!loadModule) {
+        throw new Error(`Module not found: ${modulePath}`);
+      }
+
+      const content = await loadModule() as string;
+
+      const lines = content.split('\n');
+      const title = lines[0].replace(/^#+\s*/, '') || sectionId;
+      const body = normalizeMarkdownContent(lines.slice(1).join('\n').trim());
+
+      return {
+        sectionId,
+        title,
+        content: body,
+      };
+    } catch (error) {
+      console.warn(`无法加载内容 ${sectionId} (${filePath})`, error);
+      return null;
+    }
+  }
+
+  // 生产环境：使用 fetch 加载打包后的文件
   try {
-    // 使用 fetch 加载 markdown 文件
-    // 文件在 public/content 目录中，构建后会被复制到 dist/content
-    // 使用 import.meta.env.BASE_URL 确保在 GitHub Pages 子路径部署时路径正确
     const basePath = import.meta.env.BASE_URL || '/';
-    const response = await fetch(`${basePath}content/${fileName}.md`);
+    const response = await fetch(`${basePath}content/${filePath}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const content = await response.text();
 
-    // 解析Markdown内容
     const lines = content.split('\n');
     const title = lines[0].replace(/^#+\s*/, '') || sectionId;
     const body = normalizeMarkdownContent(lines.slice(1).join('\n').trim());
@@ -59,18 +94,27 @@ export async function loadSectionContent(sectionId: string): Promise<SectionCont
       content: body,
     };
   } catch (error) {
-    // 文件不存在时静默失败
-    console.warn(`无法加载内容 ${sectionId}（文件可能不存在，请先运行爬虫）`, error);
+    console.warn(`无法加载内容 ${sectionId}`, error);
     return null;
   }
 }
 
-// 加载索引文件
+// 加载索引文件（目前不使用，保留供将来扩展）
 export async function loadContentIndex(): Promise<unknown> {
+  // 开发环境：从 src/content 加载
+  // 生产环境：从 dist/content 加载
+  if (import.meta.env.DEV) {
+    try {
+      const module = await import('../content/index.json');
+      return module.default;
+    } catch (error) {
+      console.warn('无法加载内容索引（文件可能不存在）:', error);
+      return null;
+    }
+  }
+
+  // 生产环境
   try {
-    // 使用 fetch 加载 index.json
-    // 文件在 public/content 目录中，构建后会被复制到 dist/content
-    // 使用 import.meta.env.BASE_URL 确保在 GitHub Pages 子路径部署时路径正确
     const basePath = import.meta.env.BASE_URL || '/';
     const response = await fetch(`${basePath}content/index.json`);
     if (!response.ok) {
@@ -79,8 +123,7 @@ export async function loadContentIndex(): Promise<unknown> {
     const data = await response.json();
     return data;
   } catch (error) {
-    // 文件不存在时静默失败
-    console.warn('无法加载内容索引（文件可能不存在，请先运行爬虫）:', error);
+    console.warn('无法加载内容索引:', error);
     return null;
   }
 }

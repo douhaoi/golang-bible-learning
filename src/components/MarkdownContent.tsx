@@ -149,10 +149,22 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
         remarkPlugins={[remarkGfm]}
         components={{
           img: ({ src, alt }: { src?: string; alt?: string }) => {
+            // 处理图片路径：将相对路径转换为正确的绝对路径
+            let imageSrc = src || '';
+
+            // 如果是相对路径（包含 ../images/ 或 images/）
+            if (imageSrc.includes('images/') && !imageSrc.startsWith('http')) {
+              // 提取图片文件名
+              const filename = imageSrc.split('/').pop();
+              // 使用正确的路径：开发和生产环境都从 /content/images/ 加载
+              const basePath = import.meta.env.BASE_URL || '/';
+              imageSrc = `${basePath}content/images/${filename}`;
+            }
+
             // 章节底部二维码等图片：限制尺寸 + 卡片化，避免撑满整行
             return (
               <img
-                src={src}
+                src={imageSrc}
                 alt={alt || ''}
                 loading="lazy"
                 decoding="async"

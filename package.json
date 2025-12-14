@@ -8,6 +8,7 @@
     "pnpm": ">=10.0.0"
   },
   "scripts": {
+    "predev": "node scripts/copy-content.js",
     "dev": "vite",
     "prebuild": "node scripts/copy-content.js",
     "build": "tsc && vite build",
