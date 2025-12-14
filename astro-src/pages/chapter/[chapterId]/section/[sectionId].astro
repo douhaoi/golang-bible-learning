@@ -1,11 +1,11 @@
 ---
 import { getEntry, render } from 'astro:content';
-import LucideIcon from '../../../../components/LucideIcon.astro';
-import SectionFooter from '../../../../components/SectionFooter.astro';
-import SectionNav from '../../../../components/SectionNav.astro';
-import BaseLayout from '../../../../layouts/BaseLayout.astro';
-import { getChaptersFromContent, getSectionFromContent } from '../../../../lib/contentChapters';
-import { chapterUrl, sectionUrl } from '../../../../lib/urls';
+import LucideIcon from '@/components/LucideIcon.astro';
+import SectionFooter from '@/components/SectionFooter.astro';
+import SectionNav from '@/components/SectionNav.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getChaptersFromContent, getSectionFromContent } from '@/lib/contentChapters';
+import { chapterUrl, sectionUrl } from '@/lib/urls';
 
 function buildDescriptionFromMarkdown(raw: string, maxLen = 160) {
   const withoutTitle = raw.split('\n').slice(1).join('\n');

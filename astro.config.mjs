@@ -2,6 +2,7 @@ import sitemap from '@astrojs/sitemap';
 import tailwind from '@astrojs/tailwind';
 // @ts-check
 import { defineConfig } from 'astro/config';
+import { fileURLToPath } from 'node:url';
 import remarkGfm from 'remark-gfm';
 import markdownImageSizing from './astro-src/remark/markdownImageSizing.mjs';
 import rewriteMarkdownImages from './astro-src/remark/rewriteMarkdownImages.mjs';
@@ -18,6 +19,14 @@ export default defineConfig({
   base: process.env.NODE_ENV === 'production' ? '/golang-bible-learning/' : '/',
   site,
   integrations: [tailwind(), ...(site ? [sitemap()] : [])],
+  vite: {
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./astro-src', import.meta.url)),
+        '@styles': fileURLToPath(new URL('./src', import.meta.url)),
+      },
+    },
+  },
   markdown: {
     syntaxHighlight: 'shiki',
     remarkPlugins: [

@@ -1,8 +1,8 @@
 ---
-import LucideIcon from '../../components/LucideIcon.astro';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getChaptersFromContent } from '../../lib/contentChapters';
-import { chapterUrl } from '../../lib/urls';
+import LucideIcon from '@/components/LucideIcon.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getChaptersFromContent } from '@/lib/contentChapters';
+import { chapterUrl } from '@/lib/urls';
 
 const chapters = await getChaptersFromContent();
 ---

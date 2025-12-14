@@ -1,6 +1,6 @@
 ---
-import type { Chapter } from '../lib/contentChapters';
-import { sectionUrl } from '../lib/urls';
+import type { Chapter } from '@/lib/contentChapters';
+import { sectionUrl } from '@/lib/urls';
 import LucideIcon from './LucideIcon.astro';
 
 type Props = {
@@ -27,7 +27,7 @@ const currentChapterId = currentSectionId.split('.')[0] || '';
   <div
     class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30 hidden"
     role="button"
-    tabIndex={0}
+    tabindex="0"
     aria-label="关闭导航"
     data-section-nav-overlay
   />
