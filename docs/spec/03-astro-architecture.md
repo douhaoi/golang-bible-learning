@@ -20,29 +20,16 @@
 
 动态页面通过 `getStaticPaths()` 枚举全部路径（来源见 3.2）。
 
-## 3.2 内容模型（推荐：Astro Content Collections）
+## 3.2 内容模型（Astro Content Collections）
 
 目标：让 Markdown/MDX 成为“构建期可类型化读取”的内容源，便于生成静态页与 SEO 元信息。
 
-建议组织：
-
-- 将现有内容迁移到 `src/content/sections/`（作为一个 collection）
-  - 示例：`src/content/sections/ch1/ch1-01.md`
-  - 图片：继续放在 `public/content/images/`（静态资源）
-
-然后用 `src/content/config.ts` 定义 collection（示意）：
+当前实现：
 
 - collection 名：`sections`
-- frontmatter（可逐步补齐，不要求一次到位）：
-  - `sectionId`（例如 `1.1`）
-  - `chapterId`（例如 `1`）
-  - `title`（用于 `<title>` 与页面标题）
-  - `order`（用于排序；或从文件名推导）
-
-说明：
-
-- 你当前已有 `src/content/index.json` 与 `src/data/chapters.ts`，可作为迁移期的“路径/标题来源”。
-- 长期建议以 Content Collections 为单一真源（避免多处维护）。
+- 通过 glob loader 直接读取现有内容目录（不搬迁文件）：`astro-src/content/config.ts`
+- 文件命名仍沿用：`src/content/chX/chX-YY.md`
+- 图片以静态资源方式提供：`public/content/images/`（GitHub Pages / Astro `public/` 目录直出）
 
 ## 3.3 Markdown/MDX 渲染策略（原生渲染）
 
@@ -74,15 +61,8 @@
 
 - `/golang-bible-learning/content/images/xxx.png`
 
-## 3.5 交互策略（岛屿化，最小 JS）
+## 3.5 交互策略（最小 JS）
 
-迁移到 Astro 后，默认页面是静态 HTML。需要保留交互的地方（如移动端目录展开、主题切换）用“岛屿”方式注水：
+当前实现以静态 HTML 为主，仅保留必要的少量 JS：
 
-- 继续复用现有 React 组件（通过 `@astrojs/react`）
-- 仅对需要交互的组件添加 `client:load` / `client:idle` / `client:visible`
-
-优先级建议：
-
-1. 主题切换（若目前依赖 React Context，可先作为 React 岛屿保留）
-2. 移动端章节/小节导航（折叠/展开）
-3. 代码复制按钮（如果需要）
+- 主题切换：在 `astro-src/layouts/BaseLayout.astro` 中使用内联脚本切换 `data-theme` 并写入 `localStorage`

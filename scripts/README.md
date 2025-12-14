@@ -49,37 +49,17 @@ node scripts/crawl-ch14.js
 - 自动保存到 `src/content/ch14/` 目录
 - 文件命名格式：`ch14-01.md`, `ch14-02.md`, ...
 
-## 📦 构建工具
-
-### copy-content.js - 内容复制
-
-将 `src/content/` 复制到 `public/content/`，用于开发和构建。
-
-**使用方法：**
-```bash
-node scripts/copy-content.js
-```
-
-**自动触发：**
-- `pnpm dev` - 开发前自动复制（predev hook）
-- `pnpm build` - 构建前自动复制（prebuild hook）
-
-**功能：**
-- 递归复制所有章节文件夹
-- 复制 images 目录
-- 复制 index.json
-
 ## 🖼️ 图片资源
 
-图片资源需要手动从原仓库下载并放置到 `src/content/images/` 目录。
+图片资源需要手动从原仓库下载并放置到 `public/content/images/` 目录。
 
 **原仓库图片地址：**
 - https://github.com/gopl-zh/gopl-zh.github.com/tree/master/images
 
 **图片路径格式：**
 - Markdown 中: `![](../images/ch1-01.png)` 或 `![](images/ch1-01.png)`
-- 实际位置: `src/content/images/ch1-01.png`
-- 构建后: `public/content/images/ch1-01.png` → `dist/content/images/ch1-01.png`
+- 实际位置: `public/content/images/ch1-01.png`
+- 构建后: `dist/content/images/ch1-01.png`
 
 ## 📂 目录结构
 
@@ -138,9 +118,9 @@ pnpm run crawl
 
 # 2. 手动下载图片资源
 # 从 https://github.com/gopl-zh/gopl-zh.github.com/tree/master/images
-# 下载需要的图片到 src/content/images/ 目录
+# 下载需要的图片到 public/content/images/ 目录
 
-# 3. 启动开发服务器（会自动复制内容到 public）
+# 3. 启动开发服务器
 pnpm dev
 ```
 
@@ -151,7 +131,7 @@ pnpm dev
 - ✅ 文件命名格式从 `1-1.md` 改为 `ch1-01.md`
 - ✅ 自动创建章节文件夹
 - ✅ 移除自动图片下载脚本（改为手动下载）
-- ✅ 添加 predev hook 自动复制内容
+- ✅ 输出目录调整为 `src/content/`
 
 ## 🐛 故障排查
 
@@ -178,14 +158,11 @@ pnpm dev
 **问题**：图片无法显示
 
 **解决**：
-1. 检查图片是否存在于 `src/content/images/` 目录
+1. 检查图片是否存在于 `public/content/images/` 目录
 2. 确认图片路径格式正确（`../images/xxx.png`）
-3. 运行 `node scripts/copy-content.js` 复制到 public 目录
-4. 重启开发服务器
 
 ## 📚 相关文档
 
 - [DEPLOY.md](../DEPLOY.md) - 部署文档
 - [CODE_QUALITY.md](../CODE_QUALITY.md) - 代码质量文档
 - [README.md](../README.md) - 项目说明
-

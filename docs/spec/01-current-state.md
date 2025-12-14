@@ -7,35 +7,27 @@
 
 ## 1.2 技术栈与关键依赖
 
-- 构建：Vite 5（`vite.config.ts`）
-- UI：React 18 + TypeScript + Tailwind CSS（`package.json`）
-- 路由：React Router DOM 6（`src/App.tsx`、`src/main.tsx`）
-- Markdown 渲染：`react-markdown` + `remark-gfm` + `react-syntax-highlighter`（`src/components/MarkdownContent.tsx`）
+- 构建：Astro 5（`astro.config.mjs`）
+- UI：TypeScript + Tailwind CSS（`src/index.css`、`tailwind.config.js`）
+- 内容：Astro Content Collections（`astro-src/content/config.ts`，读取 `src/content/ch*/*.md`）
+- Markdown：Astro 原生渲染（`render(entry)`）+ `remark-gfm` + 自定义 remark 插件（图片路径/尺寸）
 
-## 1.3 路由结构（SPA）
+## 1.3 路由结构（SSG）
 
-在 `src/App.tsx` 中以 `<Routes>` 定义：
+静态路由在构建期生成对应的 `index.html`（目录式输出）：
 
-- `/`：首页
-- `/chapters`：章节列表
-- `/chapter/:chapterId`：章节列表（按章）
-- `/chapter/:chapterId/section/:sectionId`：小节详情（核心内容页）
+- `/`（首页）
+- `/chapters/`（章节列表）
+- `/chapter/{chapterId}/`（某章目录页）
+- `/chapter/{chapterId}/section/{sectionId}/`（小节详情页：核心）
 
-## 1.4 内容加载方式（当前为“客户端加载”）
+## 1.4 内容加载方式（构建期渲染）
 
-`src/utils/contentLoader.ts`：
-
-- 开发环境：`import.meta.glob('../content/ch*/*.md', { query: '?raw' })` 动态导入
-- 生产环境：`fetch(`${basePath}content/${filePath}`)` 从静态文件拉取
-
-配套脚本 `scripts/copy-content.js` 会把 `src/content/` 复制到 `public/content/`，最终进入 `dist/content/`，供生产环境 `fetch` 使用。
-
-结论：目前“内容是否可见”依赖浏览器执行 JS 后再请求 Markdown，属于典型 SPA 行为。
+- Markdown 在构建期通过 Content Collections 读取并渲染为 HTML（不依赖浏览器再 `fetch` Markdown）。
+- 图片等静态资源位于 `public/content/images/`，构建后进入 `dist/content/images/`，供页面引用。
 
 ## 1.5 现有部署方式与限制（静态托管）
 
 - `.github/workflows/deploy.yml`：构建产物 `dist/` 上传到 GitHub Pages
-- `vite.config.ts`：生产环境 `base` 指向 `/golang-bible-learning/`（适配仓库路径）
-- `src/main.tsx`：`BrowserRouter basename` 同步适配 GitHub Pages
-
-结论：当前部署形态（GitHub Pages）只能托管静态文件，因此要获得“首屏直出/可抓取 HTML”，需要走 **SSG（静态生成）/预渲染** 路线，或迁出到有运行时的平台（但本次明确继续 GitHub Pages）。
+- `astro.config.mjs`：生产环境 `base` 指向 `/golang-bible-learning/`（适配仓库路径）
+- 站点为纯静态输出（SSG），无需服务器运行时

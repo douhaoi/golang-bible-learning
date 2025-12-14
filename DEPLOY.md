@@ -43,15 +43,9 @@ https://douhao.github.io/golang-bible-learning/
 
 如果你的仓库名称**不是** `golang-bible-learning`，需要修改以下文件：
 
-1. **vite.config.ts**
-   ```typescript
-   base: process.env.NODE_ENV === 'production' ? '/你的仓库名/' : '/',
-   ```
-
-2. **src/main.tsx**
-   ```typescript
-   const basename = import.meta.env.MODE === 'production' ? '/你的仓库名/' : '/'
-   ```
+1. `astro.config.mjs`
+   - `base`: 改为 `'/你的仓库名/'`
+   - CI 中 `SITE` 环境变量也需要同步（见 `.github/workflows/deploy.yml`）
 
 ### 使用自定义域名
 
@@ -63,14 +57,7 @@ https://douhao.github.io/golang-bible-learning/
    ```
 
 2. 修改 `vite.config.ts`：
-   ```typescript
-   base: '/',  // 使用自定义域名时，base 设为 '/'
-   ```
-
-3. 修改 `src/main.tsx`：
-   ```typescript
-   const basename = '/'  // 使用自定义域名时，basename 设为 '/'
-   ```
+   - 当前项目使用 Astro：请改 `astro.config.mjs` 的 `base: '/'`
 
 4. 在你的域名 DNS 设置中添加 CNAME 记录指向 `<你的用户名>.github.io`
 
@@ -96,17 +83,16 @@ pnpm run preview
 
 ### 页面 404
 
-1. 确认 `base` 和 `basename` 配置正确
-2. 检查 `public/.nojekyll` 文件存在
+1. 确认 `astro.config.mjs` 中 `base` 配置正确
+2. 确认构建产物中存在 `dist/404.html`
 3. 等待几分钟让 GitHub Pages 完全部署
 
 ### 资源加载失败
 
 1. 检查浏览器控制台的错误信息
 2. 确认所有资源路径都是相对路径或使用了正确的 base
-3. 检查 `contentLoader.ts` 中的路径是否需要调整
+3. 确认 `public/content/` 中包含图片等资源（例如 `public/content/images/`）
 
 ## 持续更新
 
 每次推送到 `main` 分支，GitHub Actions 会自动重新构建和部署站点。
-

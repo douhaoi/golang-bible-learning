@@ -1,0 +1,178 @@
+---
+import type { Chapter } from '../lib/contentChapters';
+import { sectionUrl } from '../lib/urls';
+import LucideIcon from './LucideIcon.astro';
+
+type Props = {
+  chapters: Chapter[];
+  currentSectionId: string;
+};
+
+const { chapters, currentSectionId } = Astro.props;
+const currentChapterId = currentSectionId.split('.')[0] || '';
+---
+
+<>
+  <button
+    type="button"
+    class="lg:hidden fixed top-20 left-4 z-50 soft-button p-3 rounded-lg"
+    style="color: var(--text-primary);"
+    aria-label="切换导航菜单"
+    data-section-nav-toggle
+  >
+    <LucideIcon name="menu" class="h-5 w-5" data-section-nav-icon-open />
+    <LucideIcon name="x" class="h-5 w-5 hidden" data-section-nav-icon-close />
+  </button>
+
+  <div
+    class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30 hidden"
+    role="button"
+    tabIndex={0}
+    aria-label="关闭导航"
+    data-section-nav-overlay
+  />
+
+  <aside
+    class="fixed lg:sticky top-0 left-0 h-screen z-40 w-80 lg:w-72 xl:w-80 transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0"
+    data-section-nav-aside
+  >
+    <nav class="h-full soft-card p-4 overflow-y-auto">
+      <div class="mb-4 px-2">
+        <h2 class="text-base font-bold" style="color: var(--text-primary);">Go语言圣经</h2>
+        <p class="text-xs mt-1" style="color: var(--text-secondary);">全部章节</p>
+      </div>
+
+      <div class="h-px mb-4" style="background: var(--text-secondary); opacity: 0.2;" />
+
+      <ul class="space-y-2">
+        {chapters.map((chapter) => {
+          const isExpanded = chapter.id === currentChapterId;
+          const hasCurrentSection = chapter.sections.some((s) => s.id === currentSectionId);
+          return (
+            <li>
+              <button
+                type="button"
+                class:list={[
+                  'w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-200',
+                  hasCurrentSection ? 'soft-raised' : 'hover:soft-raised',
+                ]}
+                style={`color: ${hasCurrentSection ? 'var(--accent)' : 'var(--text-primary)'};`}
+                data-chapter-toggle={chapter.id}
+                aria-expanded={isExpanded ? 'true' : 'false'}
+              >
+                <div class="flex items-center space-x-2 flex-1 min-w-0">
+                  <span class="text-sm font-semibold">第 {chapter.id} 章</span>
+                  <span class="text-xs truncate" style="color: var(--text-secondary);">
+                    {chapter.title}
+                  </span>
+                </div>
+                <LucideIcon
+                  name="chevron-down"
+                  class:list={[
+                    'h-4 w-4 flex-shrink-0 ml-2 transition-transform duration-200',
+                    isExpanded ? 'rotate-180' : '',
+                  ]}
+                />
+              </button>
+
+              <ul
+                class:list={['mt-1 ml-2 space-y-0.5', isExpanded ? '' : 'hidden']}
+                data-chapter-sections={chapter.id}
+              >
+                {chapter.sections.map((section) => {
+                  const isActive = section.id === currentSectionId;
+                  return (
+                    <li>
+                      <a
+                        href={sectionUrl(chapter.id, section.id)}
+                        class:list={[
+                          'group flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-200',
+                          isActive ? 'soft-inset' : 'hover:bg-opacity-50',
+                        ]}
+                        style={`color: ${isActive ? 'var(--accent)' : 'var(--text-primary)'}; background-color: transparent;`}
+                        data-section-link
+                      >
+                        <div class="flex-1 min-w-0">
+                          <div class="text-xs font-medium truncate">{section.title}</div>
+                        </div>
+                        <LucideIcon
+                          name="chevron-right"
+                          class:list={[
+                            'h-3 w-3 flex-shrink-0 ml-2 transition-all duration-200',
+                            isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
+                          ]}
+                        />
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </li>
+          );
+        })}
+      </ul>
+
+      <div class="mt-6 pt-4" style="border-top: 1px solid var(--shadow-dark);">
+        <div class="text-xs px-2" style="color: var(--text-secondary);">
+          共 {chapters.length} 章 · {chapters.reduce((sum, ch) => sum + ch.sections.length, 0)} 节
+        </div>
+      </div>
+    </nav>
+  </aside>
+
+  <script is:inline>
+    (function () {
+      const toggle = document.querySelector('[data-section-nav-toggle]');
+      const aside = document.querySelector('[data-section-nav-aside]');
+      const overlay = document.querySelector('[data-section-nav-overlay]');
+      const iconOpen = document.querySelector('[data-section-nav-icon-open]');
+      const iconClose = document.querySelector('[data-section-nav-icon-close]');
+
+      const setOpen = (open) => {
+        if (!aside || !overlay || !iconOpen || !iconClose) return;
+        aside.classList.toggle('-translate-x-full', !open);
+        aside.classList.toggle('translate-x-0', open);
+        overlay.classList.toggle('hidden', !open);
+        iconOpen.classList.toggle('hidden', open);
+        iconClose.classList.toggle('hidden', !open);
+      };
+
+      if (toggle) {
+        toggle.addEventListener('click', () => {
+          const isOpen = aside && aside.classList.contains('translate-x-0');
+          setOpen(!isOpen);
+        });
+      }
+
+      if (overlay) {
+        overlay.addEventListener('click', () => setOpen(false));
+        overlay.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') setOpen(false);
+        });
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') setOpen(false);
+      });
+
+      document.querySelectorAll('[data-section-link]').forEach((el) => {
+        el.addEventListener('click', () => setOpen(false));
+      });
+
+      document.querySelectorAll('[data-chapter-toggle]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const chapterId = button.getAttribute('data-chapter-toggle');
+          if (!chapterId) return;
+          const list = document.querySelector(`[data-chapter-sections="${chapterId}"]`);
+          if (!list) return;
+          const expanded = !list.classList.contains('hidden');
+          list.classList.toggle('hidden', expanded);
+          button.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+
+          const chevron = button.querySelector('svg');
+          if (chevron) chevron.classList.toggle('rotate-180', !expanded);
+        });
+      });
+    })();
+  </script>
+</>

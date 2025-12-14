@@ -1,8 +1,8 @@
+import { mkdir, writeFile } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { writeFile, mkdir } from 'fs/promises';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
 import TurndownService from 'turndown';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -13,14 +13,14 @@ const OUTPUT_DIR = join(__dirname, '../src/content');
 
 // 第14章URL映射
 const chapter14Urls = {
-  '14.1': 'appendix/appendix-a-errata.html',
-  '14.2': 'appendix/appendix-b-author.html',
-  '14.3': 'appendix/appendix-c-cpoyright.html',
-  '14.4': 'appendix/appendix-d-translations.html',
+  14.1: 'appendix/appendix-a-errata.html',
+  14.2: 'appendix/appendix-b-author.html',
+  14.3: 'appendix/appendix-c-cpoyright.html',
+  14.4: 'appendix/appendix-d-translations.html',
 };
 
 // 延迟函数
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // 抓取单个页面
 async function fetchSection(sectionId, url) {
@@ -35,10 +35,10 @@ async function fetchSection(sectionId, url) {
     });
 
     const $ = cheerio.load(response.data);
-    
+
     // 提取主要内容
     let content = '';
-    
+
     const contentSelectors = [
       'article',
       '.content',
@@ -62,7 +62,7 @@ async function fetchSection(sectionId, url) {
     }
 
     mainContent.find('script, style, nav, header, footer, .nav, .sidebar, .toc').remove();
-    
+
     const turndownService = new TurndownService({
       headingStyle: 'atx',
       codeBlockStyle: 'fenced',
@@ -70,7 +70,7 @@ async function fetchSection(sectionId, url) {
 
     turndownService.addRule('codeBlock', {
       filter: ['pre'],
-      replacement: function (content, node) {
+      replacement: (content, node) => {
         const code = node.querySelector('code');
         const lang = code ? (code.className.match(/language-(\w+)/) || [])[1] : '';
         return `\n\`\`\`${lang || ''}\n${content}\n\`\`\`\n`;
@@ -110,11 +110,11 @@ async function saveContent(sectionId, data) {
     const chapterDir = `ch${chapterNum}`;
     const sectionPadded = sectionNum.padStart(2, '0');
     const fileName = `ch${chapterNum}-${sectionPadded}.md`;
-    
+
     // 创建章节文件夹
     const chapterPath = join(OUTPUT_DIR, chapterDir);
     await mkdir(chapterPath, { recursive: true });
-    
+
     // 保存文件
     const filePath = join(chapterPath, fileName);
     await writeFile(filePath, `# ${data.title}\n\n${data.content}\n`, 'utf-8');
@@ -134,10 +134,10 @@ async function main() {
   let failCount = 0;
 
   console.log('=== 第 14 章 ===');
-  
+
   for (const [sectionId, url] of Object.entries(chapter14Urls)) {
     const data = await fetchSection(sectionId, url);
-    
+
     if (data.error) {
       failCount++;
     } else {
@@ -154,4 +154,3 @@ async function main() {
 }
 
 main().catch(console.error);
-

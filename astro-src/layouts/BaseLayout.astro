@@ -1,0 +1,152 @@
+---
+type Props = {
+  title: string;
+  description?: string;
+};
+
+const { title, description } = Astro.props;
+
+import LucideIcon from '../components/LucideIcon.astro';
+import '../../src/index.css';
+
+const pathname = Astro.url.pathname;
+const isHome = pathname === '/' || pathname === '/index.html';
+const isChapters = pathname.startsWith('/chapters') || pathname.startsWith('/chapter');
+
+const basePath = import.meta.env.BASE_URL || '/';
+const relativePath = pathname.startsWith(basePath)
+  ? pathname.slice(basePath.length)
+  : pathname.replace(/^\//, '');
+const canonicalUrl = Astro.site ? new URL(relativePath, Astro.site).toString() : undefined;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <base href={import.meta.env.BASE_URL} />
+    <title>{title}</title>
+    {description ? <meta name="description" content={description} /> : null}
+    {description ? <meta property="og:description" content={description} /> : null}
+    <meta property="og:title" content={title} />
+    {canonicalUrl ? <link rel="canonical" href={canonicalUrl} /> : null}
+    {canonicalUrl ? <meta property="og:url" content={canonicalUrl} /> : null}
+    <script>
+      (function () {
+        const saved = localStorage.getItem('theme');
+        const theme =
+          saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="min-h-screen" style="background-color: var(--bg-primary);">
+      <header class="sticky top-0 z-50" style="background-color: var(--bg-primary);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between items-center h-20">
+            <a href="" class="flex items-center space-x-3 group">
+              <div class="soft-raised p-2 rounded-xl" aria-hidden="true">
+                <LucideIcon name="book" class="h-6 w-6" style="color: var(--accent);" />
+              </div>
+              <span class="text-2xl font-bold" style="color: var(--text-primary);">Go语言圣经</span>
+            </a>
+            <nav class="flex items-center space-x-3">
+              <a
+                href=""
+                class:list={[
+                  'flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300',
+                  isHome ? 'soft-inset' : 'soft-button',
+                ]}
+                style="color: var(--text-primary);"
+              >
+                <LucideIcon name="home" class="h-4 w-4" />
+                <span>首页</span>
+              </a>
+              <a
+                href="chapters/"
+                class:list={[
+                  'flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300',
+                  isChapters ? 'soft-inset' : 'soft-button',
+                ]}
+                style="color: var(--text-primary);"
+              >
+                <LucideIcon name="list" class="h-4 w-4" />
+                <span>章节</span>
+              </a>
+              <button
+                type="button"
+                class="theme-toggle flex items-center justify-center"
+                aria-label="切换主题"
+                data-theme-toggle
+              >
+                <LucideIcon name="moon" class="h-5 w-5" style="color: var(--accent);" data-theme-icon-moon />
+                <LucideIcon name="sun" class="h-5 w-5 hidden" style="color: var(--accent);" data-theme-icon-sun />
+              </button>
+              <script is:inline>
+                (function () {
+                  const btn = document.querySelector('[data-theme-toggle]');
+                  if (!btn) return;
+                  const moon = btn.querySelector('[data-theme-icon-moon]');
+                  const sun = btn.querySelector('[data-theme-icon-sun]');
+                  const renderIcon = () => {
+                    const theme = document.documentElement.getAttribute('data-theme') || 'light';
+                    if (!moon || !sun) return;
+                    moon.classList.toggle('hidden', theme !== 'light');
+                    sun.classList.toggle('hidden', theme === 'light');
+                  };
+                  renderIcon(); 
+                  btn.addEventListener('click', () => {
+                    const current = document.documentElement.getAttribute('data-theme') || 'light';
+                    const next = current === 'light' ? 'dark' : 'light';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('theme', next);
+                    renderIcon();
+                  });
+                })();
+              </script>
+            </nav>
+          </div>
+        </div>
+      </header>
+
+      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <slot />
+      </main>
+
+      <footer class="mt-12 py-6" style="background-color: var(--bg-primary);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center text-sm" style="color: var(--text-secondary);">
+            <p>
+              基于
+              <a
+                href="https://golang-china.github.io/gopl-zh/index.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="color: var(--accent);"
+                class="underline hover:opacity-80 transition-opacity"
+              >
+                Go语言圣经
+              </a>
+              构建的学习站点
+            </p>
+            <p class="mt-2">
+              原版官网:
+              <a
+                href="http://gopl.io"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="color: var(--accent);"
+                class="underline hover:opacity-80 transition-opacity"
+              >
+                gopl.io
+              </a>
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

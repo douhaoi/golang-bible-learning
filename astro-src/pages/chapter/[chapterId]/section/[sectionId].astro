@@ -1,0 +1,181 @@
+---
+import { getEntry, render } from 'astro:content';
+import LucideIcon from '../../../../components/LucideIcon.astro';
+import SectionFooter from '../../../../components/SectionFooter.astro';
+import SectionNav from '../../../../components/SectionNav.astro';
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import { getChaptersFromContent, getSectionFromContent } from '../../../../lib/contentChapters';
+import { chapterUrl, sectionUrl } from '../../../../lib/urls';
+
+function buildDescriptionFromMarkdown(raw: string, maxLen = 160) {
+  const withoutTitle = raw.split('\n').slice(1).join('\n');
+  const withoutCode = withoutTitle.replace(/```[\s\S]*?```/g, ' ');
+  const withoutImages = withoutCode.replace(/!\[[^\]]*\]\([^)]+\)/g, ' ');
+  const withoutLinks = withoutImages.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+  const withoutHtml = withoutLinks.replace(/<[^>]+>/g, ' ');
+  const withoutMd = withoutHtml
+    .replace(/[#>*_`]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return withoutMd.slice(0, maxLen);
+}
+
+export async function getStaticPaths() {
+  const chapters = await getChaptersFromContent();
+  return chapters.flatMap((chapter) =>
+    chapter.sections.map((section) => ({
+      params: { chapterId: chapter.id, sectionId: section.id },
+    }))
+  );
+}
+
+const { chapterId, sectionId } = Astro.params;
+const chapters = await getChaptersFromContent();
+const found = await getSectionFromContent(sectionId);
+if (!found) {
+  throw new Error(`Section not found: ${sectionId}`);
+}
+if (found.chapter.id !== chapterId) {
+  throw new Error(`Section/chapter mismatch: chapterId=${chapterId} sectionId=${sectionId}`);
+}
+
+const entry = await getEntry('sections', found.section.entryId);
+if (!entry)
+  throw new Error(
+    `Markdown not found for section: ${sectionId} (entryId: ${found.section.entryId})`
+  );
+const { Content } = await render(entry);
+const description = entry.body ? buildDescriptionFromMarkdown(entry.body) : undefined;
+
+const currentIndex = found.chapter.sections.findIndex((s) => s.id === sectionId);
+const prev = currentIndex > 0 ? found.chapter.sections[currentIndex - 1] : null;
+const next =
+  currentIndex >= 0 && currentIndex < found.chapter.sections.length - 1
+    ? found.chapter.sections[currentIndex + 1]
+    : null;
+
+const currentChapterIndex = chapters.findIndex((ch) => ch.id === found.chapter.id);
+const prevChapter = currentChapterIndex > 0 ? chapters[currentChapterIndex - 1] : null;
+const nextChapter =
+  currentChapterIndex >= 0 && currentChapterIndex < chapters.length - 1
+    ? chapters[currentChapterIndex + 1]
+    : null;
+
+const actualPrev =
+  prev ?? (prevChapter ? prevChapter.sections[prevChapter.sections.length - 1] : null);
+const actualPrevChapterId = prev ? found.chapter.id : prevChapter ? prevChapter.id : null;
+
+const actualNext = next ?? (nextChapter ? nextChapter.sections[0] : null);
+const actualNextChapterId = next ? found.chapter.id : nextChapter ? nextChapter.id : null;
+---
+
+<BaseLayout
+  title={`第 ${found.chapter.id} 章 · ${found.section.id} · ${found.section.title} - Go语言圣经`}
+  description={description}
+>
+  <div class="flex gap-6 max-w-7xl mx-auto">
+    <SectionNav chapters={chapters} currentSectionId={sectionId} />
+
+    <div class="flex-1 min-w-0 lg:ml-0 ml-0">
+      <div class="mb-6 space-y-3 lg:mt-0 mt-16">
+        <a
+          href={chapterUrl(found.chapter.id)}
+          class="soft-button inline-flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium"
+          style="color: var(--accent);"
+        >
+          <LucideIcon name="arrow-left" class="h-4 w-4" />
+          <span>返回第 {found.chapter.id} 章</span>
+        </a>
+        <div class="soft-raised px-4 py-3 rounded-xl">
+          <div class="flex items-center space-x-2 text-sm flex-wrap">
+            <a
+              href=""
+              class="hover:opacity-80 transition-opacity font-medium"
+              style="color: var(--accent);"
+            >
+              首页
+            </a>
+            <span style="color: var(--text-secondary);">/</span>
+            <a
+              href="chapters/"
+              class="hover:opacity-80 transition-opacity font-medium"
+              style="color: var(--accent);"
+            >
+              章节
+            </a>
+            <span style="color: var(--text-secondary);">/</span>
+            <a
+              href={chapterUrl(found.chapter.id)}
+              class="hover:opacity-80 transition-opacity font-medium"
+              style="color: var(--accent);"
+            >
+              第 {found.chapter.id} 章
+            </a>
+            <span style="color: var(--text-secondary);">/</span>
+            <span class="font-semibold" style="color: var(--text-primary);">{found.section.title}</span>
+          </div>
+        </div>
+      </div>
+
+      <article class="soft-card p-8 md:p-10">
+        <header class="mb-8 pb-6" style="border-bottom: 2px solid var(--bg-primary);">
+          <div class="flex items-center space-x-2 text-sm mb-2" style="color: var(--accent);">
+            <span>第 {found.chapter.id} 章</span>
+            <span>·</span>
+            <span>{found.section.id}</span>
+          </div>
+          <h1 class="text-4xl font-bold" style="color: var(--text-primary);">{found.section.title}</h1>
+        </header>
+
+        <div class="content">
+          <div class="prose prose-lg max-w-none">
+            <Content />
+          </div>
+          <SectionFooter />
+        </div>
+      </article>
+
+      <div class="mt-8 flex items-center justify-between gap-4">
+        <div class="flex-1">
+          {actualPrev && actualPrevChapterId ? (
+            <a
+              href={sectionUrl(actualPrevChapterId, actualPrev.id)}
+              class="soft-button inline-flex items-center space-x-2 px-4 py-3 rounded-xl"
+            >
+              <LucideIcon name="chevron-left" class="h-4 w-4" style="color: var(--text-secondary);" />
+              <div class="text-left">
+                <div class="text-xs" style="color: var(--text-secondary);">
+                  {prev ? '上一节' : '上一章最后一节'}
+                </div>
+                <div class="text-sm font-medium" style="color: var(--text-primary);">
+                  {actualPrev.title}
+                </div>
+              </div>
+            </a>
+          ) : (
+            <div />
+          )}
+        </div>
+
+        <div class="flex-1 flex justify-end">
+          {actualNext && actualNextChapterId ? (
+            <a
+              href={sectionUrl(actualNextChapterId, actualNext.id)}
+              class="soft-button inline-flex items-center space-x-2 px-4 py-3 rounded-xl"
+            >
+              <div class="text-right">
+                <div class="text-xs" style="color: var(--text-secondary);">下一节</div>
+                <div class="text-sm font-medium" style="color: var(--text-primary);">
+                  {actualNext.title}
+                </div>
+              </div>
+              <LucideIcon name="chevron-right" class="h-4 w-4" style="color: var(--text-secondary);" />
+            </a>
+          ) : (
+            <div />
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

@@ -1,20 +1,17 @@
 # 04. 迁移计划（Astro SSG）
 
-目标：把现有 SPA 站点迁移为 Astro SSG，并以最小风险完成上线（可随时回滚到原 SPA）。
+目标：把现有站点迁移为 Astro SSG，并以最小风险完成上线。
 
-## 4.1 迁移策略：并行存在 + 逐步切流
+## 4.1 迁移策略：全量替换到根目录
 
-建议采用“新旧共存、逐步替换”的方式：
+当前仓库已采用“全量替换”：
 
-- 保留现有 Vite SPA（作为回滚兜底）
-- 新增 Astro 应用目录（推荐 `apps/site-astro/` 或直接在根目录替换，二选一）
-- 先让 Astro 跑通 **1 个小节页** 的静态生成与部署，再扩展到全量路由
-
-如果你更希望“一次性替换根目录”，也可行，但回滚成本更高。
+- 根目录 `pnpm dev/build` 对应 Astro
+- Astro 源码在 `astro-src/`（通过 `astro.config.mjs` 的 `srcDir` 隔离，避免与历史代码冲突）
 
 ## 4.2 Milestone 拆解
 
-### M0：初始化 Astro 工程（可单独提交）
+### M0：初始化 Astro 工程
 
 交付物：
 
@@ -23,8 +20,7 @@
 
 建议命令（你本地执行）：
 
-- `pnpm create astro@latest`
-- 选择：TypeScript = Yes，Output = Static
+已完成：根目录已可 `pnpm dev` / `pnpm build`。
 
 ### M1：布局与全站样式迁移
 
@@ -48,11 +44,7 @@
 
 建议任务：
 
-- 新建 `src/content/config.ts` 并定义 `sections` collection
-- 迁移内容目录：
-  - `src/content/chX/*.md` → `src/content/sections/chX/*.md`
-  - `src/content/images/*` → `public/content/images/*`（仍作为静态资源）
-- 迁移 `src/content/index.json`（可作为过渡期索引，后续可移除）
+已完成：通过 glob loader 直接读取 `src/content/ch*/*.md`（不搬迁文件）。
 
 验收：
 
