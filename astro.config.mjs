@@ -23,7 +23,7 @@ export default defineConfig({
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./astro-src', import.meta.url)),
-        '@styles': fileURLToPath(new URL('./src', import.meta.url)),
+        '@src': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
   },
@@ -39,10 +39,12 @@ export default defineConfig({
       markdownImageSizing,
     ],
     shikiConfig: {
-      theme: {
+      themes: {
         light: 'github-light',
         dark: 'github-dark',
       },
+      // 不手动指定 langs，让 Shiki 自动加载所需语言
+      // langs 会自动从代码块中检测并加载
       langAlias: {
         C: 'c',
         Go: 'go',

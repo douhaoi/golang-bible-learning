@@ -230,12 +230,32 @@
     box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
     border: 1px solid rgba(0, 0, 0, 0.03);
     padding: 1rem 1.25rem !important;
-    /* 确保 pre 元素本身不设置颜色，让子元素的内联样式生效 */
-    color: unset;
+    /* 重置颜色继承，让 Shiki 的内联样式生效 */
+    color: inherit;
   }
 
   [data-theme="dark"] .prose pre.astro-code {
     border-color: rgba(255, 255, 255, 0.03);
+    /* 暗色主题下使用更亮的背景，提升可读性 */
+    /* 使用比默认 #24292e 更亮的背景色，接近项目的 --bg-secondary 但更亮 */
+    background: #374151 !important;
+    /* 覆盖 Shiki 的暗色背景变量，使用更亮的颜色 */
+    --shiki-dark-bg: #374151 !important;
+    /* 确保文字颜色有足够对比度，使用更亮的默认文字颜色 */
+    --shiki-dark: #f3f4f6;
+  }
+
+  /* 暗色主题下，确保代码块内的文字颜色有足够对比度 */
+  [data-theme="dark"] .prose pre.astro-code code {
+    /* 如果 Shiki 没有为某些 token 设置颜色，使用更亮的默认颜色 */
+    color: #f3f4f6;
+  }
+
+  /* 暗色主题下，确保所有 token 使用 --shiki-dark 变量 */
+  /* Shiki 会在内联样式中设置 --shiki-dark 变量，我们需要确保它被使用 */
+  [data-theme="dark"] .prose pre.astro-code code span[style*="--shiki-dark"] {
+    /* 强制使用 --shiki-dark 变量，提升暗色主题下的可读性 */
+    color: var(--shiki-dark) !important;
   }
 
   /* Shiki 代码块的 code 元素样式 */
@@ -244,21 +264,13 @@
     padding: 0 !important;
     margin: 0 !important;
     box-shadow: none;
-    /* 不设置 color，让 Shiki 的内联样式生效 */
-    /* 内联样式优先级最高，会自动覆盖继承的颜色 */
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-    font-size: 0.875rem;
-    line-height: 1.6;
+    /* 不设置 color，让 Shiki 的内联样式完全控制 */
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace !important;
+    font-size: 0.875rem !important;
+    line-height: 1.6 !important;
     display: block;
-  }
-
-  /* Shiki 会在每个 token 的 span 上设置内联样式（style="color: ..."） */
-  /* 内联样式优先级最高，会自动生效，不需要额外设置 */
-  /* 我们只需要确保不覆盖这些内联样式即可 */
-  .prose pre.astro-code code span,
-  .prose pre.astro-code span {
-    /* 不设置任何颜色属性，完全依赖 Shiki 的内联样式 */
-    /* 内联样式会自动生效 */
+    /* 重置颜色继承，让内联样式生效 */
+    color: unset;
   }
 
   /* 确保代码高亮组件的背景透明，但不覆盖 Shiki 的内联颜色样式 */
