@@ -45,19 +45,19 @@ export async function loadSectionContent(sectionId: string): Promise<SectionCont
     try {
       // Vite 要求 glob 模式必须是静态字符串
       // 所以我们预先定义所有可能的导入路径
-      const contentModules = import.meta.glob('../content/ch*/*.md', { 
+      const contentModules = import.meta.glob('../content/ch*/*.md', {
         query: '?raw',
         import: 'default',
       });
-      
+
       const modulePath = `../content/${filePath}`;
       const loadModule = contentModules[modulePath];
-      
+
       if (!loadModule) {
         throw new Error(`Module not found: ${modulePath}`);
       }
 
-      const content = await loadModule() as string;
+      const content = (await loadModule()) as string;
 
       const lines = content.split('\n');
       const title = lines[0].replace(/^#+\s*/, '') || sectionId;
