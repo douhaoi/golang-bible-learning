@@ -16,6 +16,9 @@ import prismTypescript from 'react-syntax-highlighter/dist/esm/languages/prism/t
 // react-syntax-highlighter 的类型定义有时不暴露 registerLanguage，这里用 unknown 兼容
 // biome-ignore lint/suspicious/noExplicitAny: react-syntax-highlighter types limitation
 const PrismLightHighlighter = SyntaxHighlighter as any;
+PrismLightHighlighter.registerLanguage('golang', prismGo);
+PrismLightHighlighter.registerLanguage('shell', prismBash);
+PrismLightHighlighter.registerLanguage('sh', prismBash);
 PrismLightHighlighter.registerLanguage('go', prismGo);
 PrismLightHighlighter.registerLanguage('bash', prismBash);
 PrismLightHighlighter.registerLanguage('javascript', prismJavascript);
@@ -26,6 +29,20 @@ interface MarkdownContentProps {
   content: string;
 }
 
+const languageMap: Record<string, string> = {
+  golang: 'go',
+  shell: 'bash',
+  sh: 'bash',
+  zsh: 'bash',
+  console: 'bash',
+  js: 'javascript',
+  ts: 'typescript',
+  py: 'python',
+  text: 'text',
+  plain: 'text',
+  plaintext: 'text',
+};
+
 function getLanguageMeta(language: string) {
   const lang = (language || 'text').toLowerCase();
   if (lang === 'bash' || lang === 'shell' || lang === 'sh') {
@@ -35,6 +52,25 @@ function getLanguageMeta(language: string) {
     return { key: 'text', label: 'text', Icon: FileText, accent: 'var(--text-secondary)' };
   }
   return { key: lang, label: lang, Icon: FileText, accent: 'var(--text-secondary)' };
+}
+
+// 根据语言标识与代码内容推断最终使用的高亮语言
+function resolveLanguage(rawLanguage: string, codeString: string) {
+  const normalized = (rawLanguage || '').trim().toLowerCase();
+  const mapped = languageMap[normalized] || normalized;
+  if (mapped && mapped !== 'text') {
+    return mapped;
+  }
+
+  const trimmed = codeString.trim();
+  const looksLikeShell =
+    /^#!\/(usr\/bin\/env )?(bash|sh)\b/m.test(trimmed) || /^\s*[$#]\s+.+/m.test(trimmed);
+  if (looksLikeShell) return 'bash';
+
+  const looksLikeGo = /\bpackage\s+\w+/m.test(trimmed) && /\bfunc\b/m.test(trimmed);
+  if (looksLikeGo) return 'go';
+
+  return mapped || 'text';
 }
 
 // 代码块组件（带复制功能）
@@ -88,13 +124,24 @@ function CodeBlock({ language, children }: { language: string; children: string 
           )}
         </button>
       </div>
-      <div className="code-block-soft overflow-hidden">
+      <div
+        className={`code-block-soft overflow-hidden ${
+          meta.key === 'bash' ? 'code-block-terminal' : ''
+        } ${meta.key === 'text' ? 'code-block-plain' : ''}`}
+      >
         {/* 顶部语言标签条：bash/text 做更明显的“终端/输出”提示 */}
         <div
           className="flex items-center justify-between px-4 py-2 border-b"
           style={{
-            borderColor: 'rgba(0, 0, 0, 0.06)',
-            background: 'rgba(0, 0, 0, 0.02)',
+            borderColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.06)',
+            background:
+              meta.key === 'bash'
+                ? theme === 'dark'
+                  ? 'linear-gradient(90deg, rgba(129, 140, 248, 0.18), rgba(56, 189, 248, 0.07))'
+                  : 'linear-gradient(90deg, rgba(102, 126, 234, 0.18), rgba(56, 189, 248, 0.09))'
+                : theme === 'dark'
+                  ? 'rgba(255, 255, 255, 0.03)'
+                  : 'rgba(0, 0, 0, 0.02)',
           }}
         >
           <div className="flex items-center gap-2 text-xs font-medium">
@@ -102,13 +149,15 @@ function CodeBlock({ language, children }: { language: string; children: string 
             <span style={{ color: 'var(--text-secondary)' }}>{meta.label}</span>
           </div>
         </div>
-        <div className="p-4 md:p-5">
+        <div className="p-4 md:p-5 code-block-body">
           <SyntaxHighlighter
             language={language || 'text'}
             style={theme === 'dark' ? vscDarkPlus : lightTheme}
             customStyle={{
               margin: 0,
               padding: 0,
+              fontFamily:
+                'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
               fontSize: '0.875rem',
               lineHeight: '1.6',
               background: 'transparent !important',
@@ -231,18 +280,9 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
             let language = match ? match[1] : '';
             const codeString = String(children).replace(/\n$/, '');
 
-            // 语言别名映射
-            const languageMap: Record<string, string> = {
-              golang: 'go',
-              sh: 'bash',
-              shell: 'bash',
-              js: 'javascript',
-              ts: 'typescript',
-              py: 'python',
-            };
-            // 统一标准化为小写：markdown 里常见 ```Go / ```JSON 等写法
+            // 统一标准化为小写：markdown 里常见 ```Go / ```JSON 等写法，并根据内容做兜底推断
             const normalized = (language || '').toLowerCase();
-            language = languageMap[normalized] || normalized || 'text';
+            language = resolveLanguage(normalized, codeString);
 
             // 兜底：有些内容源会把 fenced code block“缩进/转义”，导致 ```bash 变成代码块内容的一部分。
             // 若检测到 codeString 本身就是 fenced block，则解包为真正的代码块再渲染。
@@ -252,8 +292,8 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
             );
             if (nestedFence) {
               const nestedLangRaw = (nestedFence[1] || '').toLowerCase();
-              const nestedLang = languageMap[nestedLangRaw] || nestedLangRaw || 'text';
               const nestedBody = (nestedFence[2] || '').replace(/\n$/, '');
+              const nestedLang = resolveLanguage(nestedLangRaw, nestedBody);
               return <CodeBlock language={nestedLang}>{nestedBody}</CodeBlock>;
             }
 

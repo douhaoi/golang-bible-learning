@@ -19,6 +19,7 @@ export default defineConfig({
   site,
   integrations: [tailwind(), ...(site ? [sitemap()] : [])],
   markdown: {
+    syntaxHighlight: 'shiki',
     remarkPlugins: [
       remarkGfm,
       // Keep markdown image URLs working under GitHub Pages subpath deployments.
@@ -42,6 +43,7 @@ export default defineConfig({
         sh: 'bash',
         shell: 'bash',
       },
+      wrap: false,
     },
   },
 });
