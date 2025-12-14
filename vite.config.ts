@@ -1,9 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), tanstackStart()],
   // GitHub Pages 部署时需要设置 base 路径
   // 如果仓库名是 golang-bible-learning，则 base 为 '/golang-bible-learning/'
   // 本地开发时使用 '/'

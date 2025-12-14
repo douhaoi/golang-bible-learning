@@ -1,40 +1,14 @@
-import { ArrowLeft, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import MarkdownContent from '../components/MarkdownContent';
-import SectionFooter from '../components/SectionFooter';
-import SectionNav from '../components/SectionNav';
-import { chapters, getSectionById } from '../data/chapters';
-import { loadSectionContent } from '../utils/contentLoader';
+import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Link, useLoaderData, useParams } from '@tanstack/react-router'
+import MarkdownContent from '../components/MarkdownContent'
+import SectionFooter from '../components/SectionFooter'
+import { chapters, getSectionById } from '../data/chapters'
 
 export default function SectionDetail() {
-  const { sectionId } = useParams<{ chapterId: string; sectionId: string }>();
-  const [content, setContent] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { sectionId } = useParams({ from: '/chapters/$chapterId/$sectionId' })
+  const { content: loaderContent } = useLoaderData({ from: '/chapters/$chapterId/$sectionId' })
 
-  const sectionData = getSectionById(sectionId || '');
-
-  useEffect(() => {
-    if (sectionId) {
-      setLoading(true);
-      setError(null);
-      loadSectionContent(sectionId)
-        .then((data) => {
-          if (data) {
-            setContent(data.content);
-          } else {
-            setError('内容未找到');
-          }
-          setLoading(false);
-        })
-        .catch((err) => {
-          setError('加载内容失败');
-          setLoading(false);
-          console.error(err);
-        });
-    }
-  }, [sectionId]);
+  const sectionData = getSectionById(sectionId || '')
 
   if (!sectionData) {
     return (
@@ -44,7 +18,7 @@ export default function SectionDetail() {
           返回章节列表
         </Link>
       </div>
-    );
+    )
   }
 
   const { chapter, section } = sectionData;
@@ -67,12 +41,8 @@ export default function SectionDetail() {
       : null;
 
   return (
-    <div className="flex gap-6 max-w-7xl mx-auto">
-      {/* 左侧导航 */}
-      <SectionNav currentSectionId={sectionId || ''} />
-
+    <div>
       {/* 主内容区域 */}
-      <div className="flex-1 min-w-0 lg:ml-0 ml-0">
         {/* Navigation */}
         <div className="mb-6 space-y-3 lg:mt-0 mt-16">
           <Link
@@ -133,27 +103,9 @@ export default function SectionDetail() {
           </header>
 
           <div className="content">
-            {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin" style={{ color: 'var(--accent)' }} />
-                <span className="ml-3" style={{ color: 'var(--text-secondary)' }}>
-                  加载内容中...
-                </span>
-              </div>
-            ) : error ? (
-              <div className="soft-raised rounded-lg p-4 my-6">
-                <p style={{ color: 'var(--text-primary)' }}>
-                  <strong>提示：</strong> {error}
-                </p>
-                <p className="mt-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                  请运行 <code className="soft-inset px-2 py-1 rounded text-xs">npm run crawl</code>{' '}
-                  或 <code className="soft-inset px-2 py-1 rounded text-xs">pnpm run crawl</code>{' '}
-                  来抓取内容。
-                </p>
-              </div>
-            ) : content ? (
+            {loaderContent?.content ? (
               <>
-                <MarkdownContent content={content} />
+                <MarkdownContent content={loaderContent.content} />
                 <SectionFooter />
               </>
             ) : (
@@ -163,7 +115,7 @@ export default function SectionDetail() {
                 </p>
                 <p className="mt-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
                   请运行爬虫脚本抓取内容：
-                  <code className="soft-inset px-2 py-1 rounded text-xs">npm run crawl</code>
+                  <code className="soft-inset px-2 py-1 rounded text-xs">pnpm run crawl</code>
                 </p>
               </div>
             )}
@@ -229,9 +181,7 @@ export default function SectionDetail() {
             )}
           </div>
         </div>
-        {/* 结束主内容区域 */}
-      </div>
-      {/* 结束 flex 容器 */}
+      {/* 结束主内容区域 */}
     </div>
-  );
+  )
 }

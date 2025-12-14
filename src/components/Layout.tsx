@@ -1,15 +1,15 @@
-import { Book, Home, List, Moon, Sun } from 'lucide-react';
-import type { ReactNode } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { useTheme } from '../contexts/ThemeContext';
+import { Book, Home, List, Moon, Sun } from 'lucide-react'
+import type { ReactNode } from 'react'
+import { Link, useLocation } from '@tanstack/react-router'
+import { useTheme } from '../contexts/ThemeContext'
 
 interface LayoutProps {
-  children: ReactNode;
+  children: ReactNode
 }
 
 export default function Layout({ children }: LayoutProps) {
-  const location = useLocation();
-  const { theme, toggleTheme } = useTheme();
+  const location = useLocation()
+  const { theme, toggleTheme } = useTheme()
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>

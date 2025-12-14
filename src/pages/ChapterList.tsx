@@ -1,9 +1,10 @@
-import { ArrowLeft, BookOpen, ChevronRight } from 'lucide-react';
-import { Link, useParams } from 'react-router-dom';
-import { chapters, getChapterById } from '../data/chapters';
+import { ArrowLeft, BookOpen, ChevronRight } from 'lucide-react'
+import { Link, useParams } from '@tanstack/react-router'
+import { chapters, getChapterById } from '../data/chapters'
 
 export default function ChapterList() {
-  const { chapterId } = useParams<{ chapterId?: string }>();
+  const params = useParams({ from: '/chapters/$chapterId' })
+  const chapterId = (params as any).chapterId
 
   if (chapterId) {
     const chapter = getChapterById(chapterId);

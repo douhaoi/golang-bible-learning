@@ -1,6 +1,6 @@
-import { BookOpen, ChevronRight, Code, Sparkles, Users, Zap } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { chapters } from '../data/chapters';
+import { BookOpen, ChevronRight, Code, Sparkles, Users, Zap } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
+import { chapters } from '../data/chapters'
 
 export default function Home() {
   const totalSections = chapters.reduce((sum, ch) => sum + ch.sections.length, 0);

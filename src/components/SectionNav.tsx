@@ -1,23 +1,22 @@
-import { ChevronDown, ChevronRight, Menu, X } from 'lucide-react';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { chapters } from '../data/chapters';
-
-interface SectionNavProps {
-  currentSectionId: string;
-}
+import { ChevronDown, ChevronRight, Menu, X } from 'lucide-react'
+import { useState } from 'react'
+import { Link, useParams } from '@tanstack/react-router'
+import { chapters } from '../data/chapters'
 
 /**
  * 章节导航侧边栏组件
  * 显示所有章节和小节，支持响应式设计
  */
-export default function SectionNav({ currentSectionId }: SectionNavProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export default function SectionNav() {
+  const params = useParams({ from: '__root' })
+  const sectionId = (params as any).sectionId || ''
+
+  const [isOpen, setIsOpen] = useState(false)
   const [expandedChapters, setExpandedChapters] = useState<Set<string>>(() => {
     // 默认展开当前小节所在的章节
-    const currentChapterId = currentSectionId.split('.')[0];
-    return new Set([currentChapterId]);
-  });
+    const currentChapterId = sectionId.split('.')[0]
+    return new Set([currentChapterId])
+  })
 
   const toggleChapter = (chapterId: string) => {
     setExpandedChapters((prev) => {
@@ -85,8 +84,8 @@ export default function SectionNav({ currentSectionId }: SectionNavProps) {
           {/* 所有章节列表 */}
           <ul className="space-y-2">
             {chapters.map((chapter) => {
-              const isExpanded = expandedChapters.has(chapter.id);
-              const hasCurrentSection = chapter.sections.some((s) => s.id === currentSectionId);
+              const isExpanded = expandedChapters.has(chapter.id)
+              const hasCurrentSection = chapter.sections.some((s) => s.id === sectionId)
               return (
                 <li key={chapter.id}>
                   {/* 章节标题（可折叠） */}
@@ -122,7 +121,7 @@ export default function SectionNav({ currentSectionId }: SectionNavProps) {
                   {isExpanded && (
                     <ul className="mt-1 ml-2 space-y-0.5">
                       {chapter.sections.map((section) => {
-                        const isActive = section.id === currentSectionId;
+                        const isActive = section.id === sectionId
                         return (
                           <li key={section.id}>
                             <Link
