@@ -1,0 +1,3 @@
+# 此目录用于存放爬虫抓取的内容文件
+# 运行 `npm run crawl` 或 `pnpm run crawl` 来抓取内容
+
