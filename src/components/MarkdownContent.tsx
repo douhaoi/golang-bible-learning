@@ -1,17 +1,25 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Copy, Check } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 
-// 导入 Prism 语言支持（Prism 会自动注册）
-import 'react-syntax-highlighter/dist/esm/languages/prism/go';
-import 'react-syntax-highlighter/dist/esm/languages/prism/bash';
-import 'react-syntax-highlighter/dist/esm/languages/prism/javascript';
-import 'react-syntax-highlighter/dist/esm/languages/prism/typescript';
-import 'react-syntax-highlighter/dist/esm/languages/prism/python';
+// Prism 语言支持需要显式注册，否则即使 markdown 写了 ```go 也不会进行 token 高亮
+import prismGo from 'react-syntax-highlighter/dist/esm/languages/prism/go';
+import prismBash from 'react-syntax-highlighter/dist/esm/languages/prism/bash';
+import prismJavascript from 'react-syntax-highlighter/dist/esm/languages/prism/javascript';
+import prismTypescript from 'react-syntax-highlighter/dist/esm/languages/prism/typescript';
+import prismPython from 'react-syntax-highlighter/dist/esm/languages/prism/python';
+
+// react-syntax-highlighter 的类型定义有时不暴露 registerLanguage，这里用 any 兼容
+const PrismLightHighlighter = SyntaxHighlighter as any;
+PrismLightHighlighter.registerLanguage('go', prismGo);
+PrismLightHighlighter.registerLanguage('bash', prismBash);
+PrismLightHighlighter.registerLanguage('javascript', prismJavascript);
+PrismLightHighlighter.registerLanguage('typescript', prismTypescript);
+PrismLightHighlighter.registerLanguage('python', prismPython);
 
 interface MarkdownContentProps {
   content: string;
@@ -81,7 +89,11 @@ function CodeBlock({ language, children }: { language: string; children: string 
             showLineNumbers={false}
             PreTag="div"
             CodeTag={({ children, ...props }: any) => (
-              <code {...props} style={{ ...props.style, background: 'transparent !important' }}>
+              <code
+                {...props}
+                data-codeblock="true"
+                style={{ ...props.style, background: 'transparent !important' }}
+              >
                 {children}
               </code>
             )}
@@ -102,12 +114,16 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
         remarkPlugins={[remarkGfm]}
         components={{
           code: ({ node, inline, className, children, ...props }: any) => {
-            // react-markdown 的 inline 属性是区分行内代码和代码块的关键：
-            // - 行内代码（单个反引号 `xxx`）：inline === true
-            // - 代码块（三个反引号 ```xxx```）：inline === false 或 undefined
-            
-            // 严格判断：只有 inline === true 才是行内代码
-            if (inline === true) {
+            // react-markdown v9 中，`inline` 可能不存在/不稳定。
+            // 用更稳的规则区分：
+            // - 行内代码通常没有换行
+            // - 代码块通常包含换行（即使只有一行，通常也会带末尾 \n）
+            const raw = String(children ?? '');
+            const hasLanguage = /language-\w+/.test(className || '');
+            const isInline =
+              typeof inline === 'boolean' ? inline : !(raw.includes('\n') || hasLanguage);
+
+            if (isInline) {
               // 行内代码：使用 Soft UI 凹陷样式，不进行语法高亮
               return (
                 <code 
@@ -120,7 +136,7 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
               );
             }
             
-            // 代码块：inline === false 或 undefined
+            // 代码块
             // 提取语言标识
             const match = /language-(\w+)/.exec(className || '');
             let language = match ? match[1] : '';
@@ -135,7 +151,9 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
               'ts': 'typescript',
               'py': 'python',
             };
-            language = languageMap[language.toLowerCase()] || language || 'text';
+            // 统一标准化为小写：markdown 里常见 ```Go / ```JSON 等写法
+            const normalized = (language || '').toLowerCase();
+            language = languageMap[normalized] || normalized || 'text';
 
             // 使用 CodeBlock 组件进行语法高亮
             return <CodeBlock language={language}>{codeString}</CodeBlock>;

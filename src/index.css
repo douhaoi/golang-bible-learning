@@ -180,7 +180,7 @@
   }
   
   /* 行内代码样式 - 只影响不在 pre 中的 code 元素 */
-  .prose code:not(pre code) {
+  .prose :not(pre) > code:not([data-codeblock]) {
     @apply px-1.5 py-0.5 rounded text-sm font-mono inline-block;
     background: var(--bg-secondary);
     color: var(--accent);
