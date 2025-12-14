@@ -143,10 +143,10 @@ const chapterUrlMap = {
     '13.5': 'ch13/ch13-05.html',
   },
   '14': {
-    '14.1': 'ch14/ch14-01.html',
-    '14.2': 'ch14/ch14-02.html',
-    '14.3': 'ch14/ch14-03.html',
-    '14.4': 'ch14/ch14-04.html',
+    '14.1': 'appendix/appendix-a-errata.html',
+    '14.2': 'appendix/appendix-b-author.html',
+    '14.3': 'appendix/appendix-c-cpoyright.html',
+    '14.4': 'appendix/appendix-d-translations.html',
   },
 };
 
