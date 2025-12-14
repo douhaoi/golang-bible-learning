@@ -38,7 +38,9 @@ export async function loadSectionContent(sectionId: string): Promise<SectionCont
   
   try {
     // 优先使用 fetch 加载（开发和生产环境都支持）
-    const response = await fetch(`/src/content/${fileName}.md`);
+    // 使用 import.meta.env.BASE_URL 确保在 GitHub Pages 子路径部署时路径正确
+    const basePath = import.meta.env.BASE_URL || '/';
+    const response = await fetch(`${basePath}src/content/${fileName}.md`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -83,7 +85,9 @@ export async function loadSectionContent(sectionId: string): Promise<SectionCont
 export async function loadContentIndex(): Promise<any> {
   try {
     // 使用 fetch 而不是 import，避免构建时解析错误
-    const response = await fetch('/src/content/index.json');
+    // 使用 import.meta.env.BASE_URL 确保在 GitHub Pages 子路径部署时路径正确
+    const basePath = import.meta.env.BASE_URL || '/';
+    const response = await fetch(`${basePath}src/content/index.json`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
