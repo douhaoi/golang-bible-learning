@@ -2,6 +2,7 @@ import { ArrowLeft, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import MarkdownContent from '../components/MarkdownContent';
+import SectionFooter from '../components/SectionFooter';
 import { chapters, getSectionById } from '../data/chapters';
 import { loadSectionContent } from '../utils/contentLoader';
 
@@ -145,7 +146,10 @@ export default function SectionDetail() {
               </p>
             </div>
           ) : content ? (
-            <MarkdownContent content={content} />
+            <>
+              <MarkdownContent content={content} />
+              <SectionFooter />
+            </>
           ) : (
             <div className="soft-raised rounded-lg p-4 my-6">
               <p className="text-sm" style={{ color: 'var(--text-primary)' }}>

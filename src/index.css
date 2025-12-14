@@ -214,4 +214,16 @@
     color: var(--text-secondary);
     box-shadow: inset 1px 1px 2px var(--shadow-dark), inset -1px -1px 2px var(--shadow-light);
   }
+
+  /* 分割线样式 - 增加上下间距 */
+  .prose hr {
+    @apply my-8 border-0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--text-secondary), transparent);
+    opacity: 0.4;
+  }
+  
+  [data-theme="dark"] .prose hr {
+    opacity: 0.5;
+  }
 }
