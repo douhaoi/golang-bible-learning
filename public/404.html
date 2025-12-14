@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/golang-bible-learning/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Go语言圣经 - 学习站点</title>
+    <script>
+      // 初始化主题，避免闪烁
+      (function() {
+        const saved = localStorage.getItem('theme');
+        const theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+
+      // GitHub Pages SPA 路由重定向
+      (function() {
+        const redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect !== location.href) {
+          history.replaceState(null, null, redirect);
+        }
+      })();
+    </script>
+    <script>
+      // 捕获 404 错误，保存重定向路径
+      (function() {
+        const path = location.pathname;
+        const base = '/golang-bible-learning/';
+
+        // 如果访问的路径不是根路径，保存到 sessionStorage
+        if (path !== base && !path.endsWith('.html')) {
+          sessionStorage.redirect = path;
+          location.href = base;
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/golang-bible-learning/src/main.tsx"></script>
+  </body>
+</html>
