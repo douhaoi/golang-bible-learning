@@ -4,27 +4,27 @@
 
 @layer base {
   :root {
-    /* 浅色主题 Soft UI */
-    --bg-primary: #e0e5ec;
-    --bg-secondary: #f0f4f8;
-    --text-primary: #2d3748;
+    /* 浅色主题 Soft UI - 优化配色 */
+    --bg-primary: #e8edf2;
+    --bg-secondary: #f5f8fa;
+    --text-primary: #1a202c;
     --text-secondary: #4a5568;
-    --shadow-light: #ffffff;
-    --shadow-dark: #a3b1c6;
+    --shadow-light: rgba(255, 255, 255, 0.6);
+    --shadow-dark: rgba(163, 177, 198, 0.3);
     --accent: #667eea;
-    --accent-hover: #764ba2;
+    --accent-hover: #5568d3;
   }
 
   [data-theme='dark'] {
-    /* 深色主题 Soft UI */
-    --bg-primary: #1a202c;
+    /* 深色主题 Soft UI - 优化配色 */
+    --bg-primary: #1e293b;
     --bg-secondary: #2d3748;
-    --text-primary: #f7fafc;
-    --text-secondary: #e2e8f0;
-    --shadow-light: #2d3748;
-    --shadow-dark: #0f1419;
-    --accent: #667eea;
-    --accent-hover: #764ba2;
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --shadow-light: rgba(71, 85, 105, 0.3);
+    --shadow-dark: rgba(15, 23, 42, 0.6);
+    --accent: #818cf8;
+    --accent-hover: #6366f1;
   }
 
   body {
@@ -36,96 +36,107 @@
 }
 
 @layer utilities {
-  /* Soft UI 凸起效果 */
+  /* Soft UI 凸起效果 - 优化后的精致阴影 */
   .soft-raised {
     background: var(--bg-secondary);
     border-radius: 1rem;
     box-shadow: 
-      8px 8px 16px var(--shadow-dark),
-      -8px -8px 16px var(--shadow-light);
+      3px 3px 6px var(--shadow-dark),
+      -3px -3px 6px var(--shadow-light);
   }
 
-  /* Soft UI 凹陷效果 */
+  /* Soft UI 凹陷效果 - 更微妙的阴影 */
   .soft-inset {
     background: var(--bg-secondary);
     border-radius: 1rem;
     box-shadow: 
-      inset 8px 8px 16px var(--shadow-dark),
-      inset -8px -8px 16px var(--shadow-light);
+      inset 2px 2px 4px var(--shadow-dark),
+      inset -2px -2px 4px var(--shadow-light);
   }
 
-  /* Soft UI 按钮 */
+  /* Soft UI 按钮 - 精简阴影 */
   .soft-button {
     background: var(--bg-secondary);
     border-radius: 0.75rem;
     box-shadow: 
-      6px 6px 12px var(--shadow-dark),
-      -6px -6px 12px var(--shadow-light);
-    transition: all 0.3s ease;
+      2px 2px 4px var(--shadow-dark),
+      -2px -2px 4px var(--shadow-light);
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
   }
 
   .soft-button:hover {
     box-shadow: 
-      4px 4px 8px var(--shadow-dark),
-      -4px -4px 8px var(--shadow-light);
+      1px 1px 3px var(--shadow-dark),
+      -1px -1px 3px var(--shadow-light);
+    transform: translateY(-1px);
   }
 
   .soft-button:active {
     box-shadow: 
-      inset 4px 4px 8px var(--shadow-dark),
-      inset -4px -4px 8px var(--shadow-light);
+      inset 2px 2px 4px var(--shadow-dark),
+      inset -2px -2px 4px var(--shadow-light);
+    transform: translateY(0);
   }
 
-  /* Soft UI 卡片 */
+  /* Soft UI 卡片 - 优雅的阴影 */
   .soft-card {
     background: var(--bg-secondary);
     border-radius: 1.5rem;
     box-shadow: 
-      12px 12px 24px var(--shadow-dark),
-      -12px -12px 24px var(--shadow-light);
-    transition: all 0.3s ease;
+      4px 4px 8px var(--shadow-dark),
+      -4px -4px 8px var(--shadow-light);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  [data-theme='dark'] .soft-card {
+    border-color: rgba(255, 255, 255, 0.05);
   }
 
   .soft-card:hover {
     box-shadow: 
-      8px 8px 16px var(--shadow-dark),
-      -8px -8px 16px var(--shadow-light);
+      3px 3px 6px var(--shadow-dark),
+      -3px -3px 6px var(--shadow-light);
     transform: translateY(-2px);
   }
 
-  /* Soft UI 输入框 */
+  /* Soft UI 输入框 - 轻微凹陷 */
   .soft-input {
     background: var(--bg-secondary);
     border-radius: 0.75rem;
     box-shadow: 
-      inset 4px 4px 8px var(--shadow-dark),
-      inset -4px -4px 8px var(--shadow-light);
-    border: none;
+      inset 2px 2px 4px var(--shadow-dark),
+      inset -2px -2px 4px var(--shadow-light);
+    border: 1px solid transparent;
     outline: none;
   }
 
-  /* 主题切换按钮 */
+  /* 主题切换按钮 - 精致设计 */
   .theme-toggle {
     background: var(--bg-secondary);
     border-radius: 50%;
     width: 3rem;
     height: 3rem;
     box-shadow: 
-      6px 6px 12px var(--shadow-dark),
-      -6px -6px 12px var(--shadow-light);
-    transition: all 0.3s ease;
+      2px 2px 4px var(--shadow-dark),
+      -2px -2px 4px var(--shadow-light);
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
   }
 
   .theme-toggle:hover {
     box-shadow: 
-      4px 4px 8px var(--shadow-dark),
-      -4px -4px 8px var(--shadow-light);
+      1px 1px 3px var(--shadow-dark),
+      -1px -1px 3px var(--shadow-light);
+    transform: scale(1.05);
   }
 
   .theme-toggle:active {
     box-shadow: 
-      inset 4px 4px 8px var(--shadow-dark),
-      inset -4px -4px 8px var(--shadow-light);
+      inset 2px 2px 4px var(--shadow-dark),
+      inset -2px -2px 4px var(--shadow-light);
+    transform: scale(0.95);
   }
 }
 
@@ -159,16 +170,28 @@
     background: var(--bg-primary);
     color: var(--accent);
     box-shadow: 
-      inset 2px 2px 4px var(--shadow-dark),
-      inset -2px -2px 4px var(--shadow-light);
+      inset 1px 1px 2px var(--shadow-dark),
+      inset -1px -1px 2px var(--shadow-light);
   }
   
   .prose pre {
     @apply p-4 rounded-lg overflow-x-auto mb-4;
     background: var(--bg-secondary);
     box-shadow: 
-      inset 4px 4px 8px var(--shadow-dark),
-      inset -4px -4px 8px var(--shadow-light);
+      inset 2px 2px 4px var(--shadow-dark),
+      inset -2px -2px 4px var(--shadow-light);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  [data-theme='dark'] .prose pre {
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+
+  /* 确保代码高亮组件的背景透明 */
+  .prose pre[class*="language-"],
+  .prose code[class*="language-"],
+  .prose pre code {
+    background: transparent !important;
   }
   
   .prose pre code {
@@ -203,7 +226,7 @@
     border-color: var(--accent);
     color: var(--text-secondary);
     box-shadow: 
-      inset 2px 2px 4px var(--shadow-dark),
-      inset -2px -2px 4px var(--shadow-light);
+      inset 1px 1px 2px var(--shadow-dark),
+      inset -1px -1px 2px var(--shadow-light);
   }
 }

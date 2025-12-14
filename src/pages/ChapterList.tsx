@@ -37,13 +37,14 @@ export default function ChapterList() {
           </p>
         </div>
 
-        <div className="soft-card divide-y" style={{ borderColor: 'transparent' }}>
-          {chapter.sections.map((section, index) => (
-            <Link
-              key={section.id}
-              to={section.path}
-              className="block p-6 soft-raised rounded-xl mb-2 last:mb-0"
-            >
+        <div className="soft-card p-6 md:p-8">
+          <div className="space-y-4">
+            {chapter.sections.map((section, index) => (
+              <Link
+                key={section.id}
+                to={section.path}
+                className="block p-5 md:p-6 soft-raised rounded-xl transition-all duration-200 hover:scale-[1.02]"
+              >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <div className="soft-inset w-12 h-12 rounded-lg flex items-center justify-center">
@@ -58,8 +59,9 @@ export default function ChapterList() {
                 </div>
                 <ChevronRight className="h-5 w-5" style={{ color: 'var(--text-secondary)' }} />
               </div>
-            </Link>
-          ))}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     )
@@ -74,7 +76,7 @@ export default function ChapterList() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
         {chapters.map((chapter) => (
           <Link
             key={chapter.id}

@@ -3,7 +3,7 @@ import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Copy, Check } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 
 interface MarkdownContentProps {
@@ -14,6 +14,18 @@ interface MarkdownContentProps {
 function CodeBlock({ language, children }: { language: string; children: string }) {
   const [copied, setCopied] = useState(false);
   const { theme } = useTheme();
+
+  // 自定义浅色主题，移除白色背景
+  const lightTheme = useMemo(() => {
+    const base = { ...oneLight };
+    // 覆盖所有可能的背景色设置
+    Object.keys(base).forEach((key) => {
+      if (base[key] && typeof base[key] === 'object' && 'background' in base[key]) {
+        base[key] = { ...base[key], background: 'transparent' };
+      }
+    });
+    return base;
+  }, []);
 
   const handleCopy = async () => {
     try {
@@ -47,22 +59,24 @@ function CodeBlock({ language, children }: { language: string; children: string 
           )}
         </button>
       </div>
-      <SyntaxHighlighter
-        language={language || 'text'}
-        style={theme === 'dark' ? vscDarkPlus : oneLight}
-        customStyle={{
-          margin: 0,
-          borderRadius: '0.75rem',
-          padding: '1rem',
-          fontSize: '0.875rem',
-          lineHeight: '1.5',
-          background: 'var(--bg-primary)',
-        }}
-        showLineNumbers={false}
-        PreTag="div"
-      >
-        {children}
-      </SyntaxHighlighter>
+      <div className="soft-inset rounded-xl overflow-hidden" style={{ padding: 0 }}>
+        <SyntaxHighlighter
+          language={language || 'text'}
+          style={theme === 'dark' ? vscDarkPlus : lightTheme}
+          customStyle={{
+            margin: 0,
+            borderRadius: '0.75rem',
+            padding: '1rem',
+            fontSize: '0.875rem',
+            lineHeight: '1.5',
+            background: 'transparent !important',
+          }}
+          showLineNumbers={false}
+          PreTag="div"
+        >
+          {children}
+        </SyntaxHighlighter>
+      </div>
     </div>
   );
 }
