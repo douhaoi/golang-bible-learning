@@ -149,7 +149,7 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
                 loading="lazy"
                 decoding="async"
                 className="soft-raised p-3 rounded-2xl h-auto"
-                style={{ maxWidth: '220px', width: '100%', flexShrink: 0 }}
+                style={{ maxWidth: '300px', width: '100%', flexShrink: 0 }}
               />
             );
           },
