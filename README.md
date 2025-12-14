@@ -5,7 +5,9 @@
 ## 功能特性
 
 - 📚 **完整的章节结构** - 包含14个主要章节，涵盖Go语言从入门到高级的所有内容
-- 🎨 **现代化UI设计** - 使用 Tailwind CSS 构建美观的响应式界面
+- 🎨 **现代化UI设计** - Soft UI 设计风格，深色/浅色主题切换
+- 💻 **增强语法高亮** - 支持 Go、Bash、JSON 等多种语言的语法高亮
+- 🖼️ **灵活图片控制** - 支持多种图片尺寸（全宽、大、中、小）
 - 🚀 **快速加载** - 基于 Vite 构建，提供极速的开发和生产体验
 - 📱 **响应式设计** - 完美支持桌面端和移动端访问
 - 🔍 **便捷导航** - 清晰的章节导航和前后章节切换功能
@@ -91,16 +93,27 @@ pnpm run preview
 │   │   └── chapters.ts      # 章节数据结构
 │   ├── utils/               # 工具函数
 │   │   └── contentLoader.ts # 内容加载器
-│   ├── content/             # 抓取的内容（Markdown文件）
+│   ├── content/             # 内容目录（章节文件夹结构）
+│   │   ├── ch1/            # 第1章
+│   │   │   ├── ch1-01.md
+│   │   │   └── ...
+│   │   ├── ch2/            # 第2章
+│   │   ├── images/         # 图片资源
+│   │   └── index.json      # 章节索引
 │   ├── App.tsx              # 主应用组件
 │   ├── main.tsx             # 应用入口
 │   └── index.css            # 全局样式
 ├── scripts/
-│   └── crawler.js           # 爬虫脚本
+│   ├── crawler.js           # 完整爬虫脚本
+│   ├── crawl-ch14.js        # 第14章爬虫
+│   ├── copy-content.js      # 内容复制脚本
+│   └── README.md            # 脚本使用说明
 ├── index.html               # HTML模板
 ├── package.json             # 项目配置
 ├── vite.config.ts           # Vite配置
-└── tailwind.config.js       # Tailwind配置
+├── tailwind.config.js       # Tailwind配置
+├── MARKDOWN_GUIDE.md        # Markdown书写指南
+└── DEPLOY.md                # 部署文档
 ```
 
 ## 章节内容
@@ -148,11 +161,43 @@ pnpm run crawl
 
 ### 内容格式
 
-每个小节的内容会保存为独立的Markdown文件，文件名格式为：`{章节号}-{小节号}.md`
+每个小节的内容会保存到对应章节文件夹中，文件名格式为：`ch{章节号}-{小节号}.md`
 
 例如：
-- `1-1.md` - 第1章第1节
-- `2-3.md` - 第2章第3节
+- `ch1/ch1-01.md` - 第1章第1节
+- `ch2/ch2-03.md` - 第2章第3节
+- `ch14/ch14-01.md` - 第14章第1节（附录）
+
+## Markdown 书写指南
+
+项目支持增强版 Markdown，包括：
+
+### 图片尺寸控制
+
+通过 alt 文本标记控制图片显示尺寸：
+
+```markdown
+![full-width](image.png)    # 100% 宽度（架构图、流程图）
+![large](image.png)          # 80% 宽度（重要图表）
+![medium](image.png)         # 600px（示例图）
+![](image.png)               # 300px（默认，二维码等）
+```
+
+### 代码高亮
+
+支持多种语言的语法高亮：
+
+```markdown
+​```go
+package main
+​```
+
+​```bash
+$ go run main.go
+​```
+```
+
+完整的 Markdown 书写指南请查看 [MARKDOWN_GUIDE.md](./MARKDOWN_GUIDE.md)。
 
 ## 内容集成
 

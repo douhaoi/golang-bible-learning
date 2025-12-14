@@ -161,15 +161,35 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
               imageSrc = `${basePath}content/images/${filename}`;
             }
 
-            // 章节底部二维码等图片：限制尺寸 + 卡片化，避免撑满整行
+            // 根据 alt 文本中的特殊标记来控制图片尺寸
+            // 支持的标记：full/full-width (100%), large (80%), medium (600px), small/默认 (300px)
+            const altText = (alt || '').toLowerCase();
+            let maxWidth = '300px'; // 默认小尺寸（适合二维码等）
+            let displayAlt = alt || '';
+
+            // 检测尺寸标记
+            if (altText.includes('full-width') || altText.includes('full')) {
+              maxWidth = '100%';
+              displayAlt = alt?.replace(/\[?full-?width\]?/gi, '').trim() || '';
+            } else if (altText.includes('large')) {
+              maxWidth = '80%';
+              displayAlt = alt?.replace(/\[?large\]?/gi, '').trim() || '';
+            } else if (altText.includes('medium')) {
+              maxWidth = '600px';
+              displayAlt = alt?.replace(/\[?medium\]?/gi, '').trim() || '';
+            } else if (altText.includes('small')) {
+              maxWidth = '300px';
+              displayAlt = alt?.replace(/\[?small\]?/gi, '').trim() || '';
+            }
+
             return (
               <img
                 src={imageSrc}
-                alt={alt || ''}
+                alt={displayAlt}
                 loading="lazy"
                 decoding="async"
                 className="soft-raised p-3 rounded-2xl h-auto"
-                style={{ maxWidth: '300px', width: '100%', flexShrink: 0 }}
+                style={{ maxWidth, width: '100%', flexShrink: 0 }}
               />
             );
           },
