@@ -102,60 +102,29 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
         remarkPlugins={[remarkGfm]}
         components={{
           code: ({ node, inline, className, children, ...props }: any) => {
-            // 行内代码：使用单个反引号 `xxx`，inline === true
-            // 代码块：使用三个反引号 ```xxx```，inline === false 或 undefined
-            // react-markdown 会正确传递 inline 参数来区分两者
+            // react-markdown 的 inline 属性是区分行内代码和代码块的关键：
+            // - 行内代码（单个反引号 `xxx`）：inline === true
+            // - 代码块（三个反引号 ```xxx```）：inline === false 或 undefined
             
-            // 严格判断：行内代码和代码块
-            // 行内代码：inline === true 或 node.type === 'inlineCode'
-            // 代码块：inline === false/undefined 或 node.type === 'code' 或存在 className
-            const isInlineCode = inline === true || node?.type === 'inlineCode';
-            
-            // 行内代码：直接渲染为行内代码样式，不进行语法高亮
-            if (isInlineCode) {
+            // 严格判断：只有 inline === true 才是行内代码
+            if (inline === true) {
+              // 行内代码：使用 Soft UI 凹陷样式，不进行语法高亮
               return (
-                <code className="soft-inset px-1.5 py-0.5 rounded text-sm font-mono inline" style={{ color: 'var(--accent)' }} {...props}>
+                <code 
+                  className="soft-inset px-1.5 py-0.5 rounded text-sm font-mono inline-block" 
+                  style={{ color: 'var(--accent)' }} 
+                  {...props}
+                >
                   {children}
                 </code>
               );
             }
             
-            // 代码块：使用三个反引号包裹的内容
-
-            // 代码块：检查是否有语言标识
+            // 代码块：inline === false 或 undefined
+            // 提取语言标识
             const match = /language-(\w+)/.exec(className || '');
             let language = match ? match[1] : '';
             const codeString = String(children).replace(/\n$/, '');
-
-            // 如果没有语言标识，检查内容是否看起来像代码
-            // 如果只是简单的文本或符号列表，不应用代码高亮
-            if (!language) {
-              // 检查是否包含明显的代码特征（如括号、分号、关键字等）
-              const codePattern = /[{}();=]|func|var|const|import|package|return|if|else|for|while|fmt\.|Println|Printf/i;
-              const hasCodeFeatures = codePattern.test(codeString);
-              
-              // 检查是否是运算符列表（主要是符号，没有字母或数字，或者只有少量字母）
-              const lines = codeString.split('\n').filter(line => line.trim().length > 0);
-              const isOperatorList = lines.every(line => {
-                const trimmed = line.trim();
-                // 如果行主要是符号和空格，可能是运算符列表
-                return /^[\s\*\/\%\<\>\&\|\^\+\-\!\=\&\&]+$/.test(trimmed) || 
-                       trimmed.length < 20 && /^[\s\w\<\>\=\!\&\|\^]+$/.test(trimmed);
-              });
-              
-              // 如果内容很短且没有代码特征，或者是运算符列表，使用普通代码样式
-              if ((!hasCodeFeatures && codeString.length < 100 && lines.length <= 5) || 
-                  (isOperatorList && lines.length <= 10)) {
-                return (
-                  <code className="soft-inset px-3 py-2 rounded-lg text-sm font-mono block whitespace-pre" style={{ color: 'var(--text-primary)' }}>
-                    {codeString}
-                  </code>
-                );
-              }
-              
-              // 否则使用 text 语言
-              language = 'text';
-            }
 
             // 语言别名映射
             const languageMap: Record<string, string> = {
@@ -166,7 +135,7 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
               'ts': 'typescript',
               'py': 'python',
             };
-            language = languageMap[language.toLowerCase()] || language;
+            language = languageMap[language.toLowerCase()] || language || 'text';
 
             // 使用 CodeBlock 组件进行语法高亮
             return <CodeBlock language={language}>{codeString}</CodeBlock>;
