@@ -3,12 +3,15 @@
  */
 export default function SectionFooter() {
   return (
-    <div className="mt-12 pt-8 border-t-2 border-opacity-40" style={{ borderColor: 'var(--text-secondary)' }}>
+    <div
+      className="mt-12 pt-8 border-t-2 border-opacity-40"
+      style={{ borderColor: 'var(--text-secondary)' }}
+    >
       {/* 二维码容器 */}
       <div className="flex flex-wrap justify-center gap-6 items-center">
-        <a 
-          href="https://chai2010.cn/advanced-go-programming-book/" 
-          target="_blank" 
+        <a
+          href="https://chai2010.cn/advanced-go-programming-book/"
+          target="_blank"
           rel="noopener noreferrer"
           className="block transition-transform hover:scale-105"
         >
@@ -21,9 +24,9 @@ export default function SectionFooter() {
             style={{ maxWidth: '300px', width: '100%', flexShrink: 0 }}
           />
         </a>
-        <a 
-          href="https://chai2010.cn/advanced-go-programming-book/" 
-          target="_blank" 
+        <a
+          href="https://chai2010.cn/advanced-go-programming-book/"
+          target="_blank"
           rel="noopener noreferrer"
           className="block transition-transform hover:scale-105"
         >
@@ -39,10 +42,12 @@ export default function SectionFooter() {
       </div>
 
       {/* 版权信息（可选） */}
-      <div className="mt-6 text-center text-sm opacity-60" style={{ color: 'var(--text-secondary)' }}>
+      <div
+        className="mt-6 text-center text-sm opacity-60"
+        style={{ color: 'var(--text-secondary)' }}
+      >
         <p>内容来源于《Go语言圣经》中文版</p>
       </div>
     </div>
   );
 }
-

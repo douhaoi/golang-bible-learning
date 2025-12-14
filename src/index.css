@@ -222,7 +222,7 @@
     background: linear-gradient(to right, transparent, var(--text-secondary), transparent);
     opacity: 0.4;
   }
-  
+
   [data-theme="dark"] .prose hr {
     opacity: 0.5;
   }

@@ -77,14 +77,16 @@ export default function SectionNav({ currentSectionId }: SectionNavProps) {
           </div>
 
           {/* 分割线 */}
-          <div className="h-px mb-4" style={{ background: 'var(--text-secondary)', opacity: 0.2 }} />
+          <div
+            className="h-px mb-4"
+            style={{ background: 'var(--text-secondary)', opacity: 0.2 }}
+          />
 
           {/* 所有章节列表 */}
           <ul className="space-y-2">
             {chapters.map((chapter) => {
               const isExpanded = expandedChapters.has(chapter.id);
-              const hasCurrentSection = chapter.sections.some(s => s.id === currentSectionId);
-              
+              const hasCurrentSection = chapter.sections.some((s) => s.id === currentSectionId);
               return (
                 <li key={chapter.id}>
                   {/* 章节标题（可折叠） */}
@@ -161,7 +163,8 @@ export default function SectionNav({ currentSectionId }: SectionNavProps) {
           {/* 底部统计 */}
           <div className="mt-6 pt-4" style={{ borderTop: '1px solid var(--shadow-dark)' }}>
             <div className="text-xs px-2" style={{ color: 'var(--text-secondary)' }}>
-              共 {chapters.length} 章 · {chapters.reduce((sum, ch) => sum + ch.sections.length, 0)} 节
+              共 {chapters.length} 章 · {chapters.reduce((sum, ch) => sum + ch.sections.length, 0)}{' '}
+              节
             </div>
           </div>
         </nav>
@@ -169,4 +172,3 @@ export default function SectionNav({ currentSectionId }: SectionNavProps) {
     </>
   );
 }
-
