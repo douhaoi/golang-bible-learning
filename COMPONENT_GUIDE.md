@@ -4,6 +4,47 @@
 
 ## 📦 组件列表
 
+### SectionNav - 章节导航侧边栏
+
+**位置**: `src/components/SectionNav.tsx`
+
+**功能**: 在左侧显示当前章节的所有小节，支持快速切换。
+
+**特性**:
+- ✅ 固定在左侧（桌面端）
+- ✅ 可折叠菜单（移动端）
+- ✅ 当前小节高亮显示
+- ✅ 悬停效果
+- ✅ 响应式设计
+- ✅ Soft UI 样式
+- ✅ 平滑过渡动画
+
+**响应式行为**:
+- **桌面端（≥1024px）**: 固定显示在左侧
+- **移动端（<1024px）**: 可通过左上角按钮展开/收起
+
+**使用示例**:
+
+```tsx
+import SectionNav from '../components/SectionNav';
+
+<SectionNav 
+  chapter={chapter} 
+  currentSectionId={sectionId} 
+/>
+```
+
+**Props**:
+
+```typescript
+interface SectionNavProps {
+  chapter: Chapter;       // 当前章节对象
+  currentSectionId: string; // 当前小节 ID
+}
+```
+
+---
+
 ### SectionFooter - 章节底部组件
 
 **位置**: `src/components/SectionFooter.tsx`
@@ -233,4 +274,7 @@ export default function Button({ label, onClick, variant = 'primary' }: ButtonPr
 - ✅ 集成到 `SectionDetail` 页面
 - ✅ 自动在每个章节底部显示二维码
 - ✅ 移除 Markdown 文件中的手动二维码
+- ✅ 创建 `SectionNav` 左侧导航组件
+- ✅ 支持章节内快速切换
+- ✅ 响应式设计，移动端可折叠
 
