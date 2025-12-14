@@ -68,25 +68,43 @@ export default function SectionDetail() {
   return (
     <div className="max-w-4xl mx-auto">
       {/* Navigation */}
-      <div className="mb-6">
+      <div className="mb-6 space-y-3">
         <Link
           to={`/chapter/${chapter.id}`}
-          className="inline-flex items-center space-x-2 text-sm font-medium mb-4"
+          className="soft-button inline-flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium"
           style={{ color: 'var(--accent)' }}
         >
           <ArrowLeft className="h-4 w-4" />
           <span>返回第 {chapter.id} 章</span>
         </Link>
-        <div className="flex items-center space-x-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-          <Link to="/" className="hover:opacity-80 transition-opacity">首页</Link>
-          <span>/</span>
-          <Link to="/chapters" className="hover:opacity-80 transition-opacity">章节</Link>
-          <span>/</span>
-          <Link to={`/chapter/${chapter.id}`} className="hover:opacity-80 transition-opacity">
-            第 {chapter.id} 章
-          </Link>
-          <span>/</span>
-          <span style={{ color: 'var(--text-primary)' }}>{section.title}</span>
+        <div className="soft-raised px-4 py-3 rounded-xl">
+          <div className="flex items-center space-x-2 text-sm flex-wrap">
+            <Link 
+              to="/" 
+              className="hover:opacity-80 transition-opacity font-medium"
+              style={{ color: 'var(--accent)' }}
+            >
+              首页
+            </Link>
+            <span style={{ color: 'var(--text-secondary)' }}>/</span>
+            <Link 
+              to="/chapters" 
+              className="hover:opacity-80 transition-opacity font-medium"
+              style={{ color: 'var(--accent)' }}
+            >
+              章节
+            </Link>
+            <span style={{ color: 'var(--text-secondary)' }}>/</span>
+            <Link 
+              to={`/chapter/${chapter.id}`} 
+              className="hover:opacity-80 transition-opacity font-medium"
+              style={{ color: 'var(--accent)' }}
+            >
+              第 {chapter.id} 章
+            </Link>
+            <span style={{ color: 'var(--text-secondary)' }}>/</span>
+            <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>{section.title}</span>
+          </div>
         </div>
       </div>
 

@@ -54,6 +54,20 @@
       inset -2px -2px 4px var(--shadow-light);
   }
 
+  /* 代码块专用 Soft UI 样式 */
+  .code-block-soft {
+    background: var(--bg-secondary);
+    border-radius: 1.25rem;
+    box-shadow: 
+      inset 3px 3px 6px var(--shadow-dark),
+      inset -3px -3px 6px var(--shadow-light);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+  }
+
+  [data-theme='dark'] .code-block-soft {
+    border-color: rgba(255, 255, 255, 0.03);
+  }
+
   /* Soft UI 按钮 - 精简阴影 */
   .soft-button {
     background: var(--bg-secondary);

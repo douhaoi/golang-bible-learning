@@ -6,6 +6,13 @@ import { Copy, Check } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 
+// 导入 Prism 语言支持（Prism 会自动注册）
+import 'react-syntax-highlighter/dist/esm/languages/prism/go';
+import 'react-syntax-highlighter/dist/esm/languages/prism/bash';
+import 'react-syntax-highlighter/dist/esm/languages/prism/javascript';
+import 'react-syntax-highlighter/dist/esm/languages/prism/typescript';
+import 'react-syntax-highlighter/dist/esm/languages/prism/python';
+
 interface MarkdownContentProps {
   content: string;
 }
@@ -38,44 +45,51 @@ function CodeBlock({ language, children }: { language: string; children: string 
   };
 
   return (
-    <div className="relative group">
-      <div className="absolute top-2 right-2 z-10">
+    <div className="relative group my-6">
+      <div className="absolute top-3 right-3 z-10">
         <button
           onClick={handleCopy}
-          className="soft-button flex items-center space-x-1 px-2 py-1 text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+          className="soft-button flex items-center space-x-1 px-3 py-1.5 text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
           style={{ color: 'var(--text-primary)' }}
           title="复制代码"
         >
           {copied ? (
             <>
-              <Check className="h-3 w-3" />
+              <Check className="h-3.5 w-3.5" />
               <span>已复制</span>
             </>
           ) : (
             <>
-              <Copy className="h-3 w-3" />
+              <Copy className="h-3.5 w-3.5" />
               <span>复制</span>
             </>
           )}
         </button>
       </div>
-      <div className="soft-inset rounded-xl overflow-hidden" style={{ padding: 0 }}>
-        <SyntaxHighlighter
-          language={language || 'text'}
-          style={theme === 'dark' ? vscDarkPlus : lightTheme}
-          customStyle={{
-            margin: 0,
-            borderRadius: '0.75rem',
-            padding: '1rem',
-            fontSize: '0.875rem',
-            lineHeight: '1.5',
-            background: 'transparent !important',
-          }}
-          showLineNumbers={false}
-          PreTag="div"
-        >
-          {children}
-        </SyntaxHighlighter>
+      <div className="code-block-soft overflow-hidden">
+        <div className="p-4 md:p-5">
+          <SyntaxHighlighter
+            language={language || 'text'}
+            style={theme === 'dark' ? vscDarkPlus : lightTheme}
+            customStyle={{
+              margin: 0,
+              padding: 0,
+              fontSize: '0.875rem',
+              lineHeight: '1.6',
+              background: 'transparent !important',
+            }}
+            showLineNumbers={false}
+            PreTag="div"
+            CodeTag={({ children, ...props }: any) => (
+              <code {...props} style={{ ...props.style, background: 'transparent !important' }}>
+                {children}
+              </code>
+            )}
+            useInlineStyles={true}
+          >
+            {children}
+          </SyntaxHighlighter>
+        </div>
       </div>
     </div>
   );
@@ -88,20 +102,79 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
         remarkPlugins={[remarkGfm]}
         components={{
           code: ({ node, inline, className, children, ...props }: any) => {
+            // 行内代码：使用单个反引号 `xxx`，inline === true
+            // 代码块：使用三个反引号 ```xxx```，inline === false 或 undefined
+            // react-markdown 会正确传递 inline 参数来区分两者
+            
+            // 严格判断：行内代码和代码块
+            // 行内代码：inline === true 或 node.type === 'inlineCode'
+            // 代码块：inline === false/undefined 或 node.type === 'code' 或存在 className
+            const isInlineCode = inline === true || node?.type === 'inlineCode';
+            
+            // 行内代码：直接渲染为行内代码样式，不进行语法高亮
+            if (isInlineCode) {
+              return (
+                <code className="soft-inset px-1.5 py-0.5 rounded text-sm font-mono inline" style={{ color: 'var(--accent)' }} {...props}>
+                  {children}
+                </code>
+              );
+            }
+            
+            // 代码块：使用三个反引号包裹的内容
+
+            // 代码块：检查是否有语言标识
             const match = /language-(\w+)/.exec(className || '');
-            const language = match ? match[1] : '';
+            let language = match ? match[1] : '';
             const codeString = String(children).replace(/\n$/, '');
 
-            if (!inline && language) {
-              return <CodeBlock language={language}>{codeString}</CodeBlock>;
+            // 如果没有语言标识，检查内容是否看起来像代码
+            // 如果只是简单的文本或符号列表，不应用代码高亮
+            if (!language) {
+              // 检查是否包含明显的代码特征（如括号、分号、关键字等）
+              const codePattern = /[{}();=]|func|var|const|import|package|return|if|else|for|while|fmt\.|Println|Printf/i;
+              const hasCodeFeatures = codePattern.test(codeString);
+              
+              // 检查是否是运算符列表（主要是符号，没有字母或数字，或者只有少量字母）
+              const lines = codeString.split('\n').filter(line => line.trim().length > 0);
+              const isOperatorList = lines.every(line => {
+                const trimmed = line.trim();
+                // 如果行主要是符号和空格，可能是运算符列表
+                return /^[\s\*\/\%\<\>\&\|\^\+\-\!\=\&\&]+$/.test(trimmed) || 
+                       trimmed.length < 20 && /^[\s\w\<\>\=\!\&\|\^]+$/.test(trimmed);
+              });
+              
+              // 如果内容很短且没有代码特征，或者是运算符列表，使用普通代码样式
+              if ((!hasCodeFeatures && codeString.length < 100 && lines.length <= 5) || 
+                  (isOperatorList && lines.length <= 10)) {
+                return (
+                  <code className="soft-inset px-3 py-2 rounded-lg text-sm font-mono block whitespace-pre" style={{ color: 'var(--text-primary)' }}>
+                    {codeString}
+                  </code>
+                );
+              }
+              
+              // 否则使用 text 语言
+              language = 'text';
             }
 
-            // 行内代码
-            return (
-              <code className="soft-inset px-1.5 py-0.5 rounded text-sm font-mono" style={{ color: 'var(--accent)' }} {...props}>
-                {children}
-              </code>
-            );
+            // 语言别名映射
+            const languageMap: Record<string, string> = {
+              'golang': 'go',
+              'sh': 'bash',
+              'shell': 'bash',
+              'js': 'javascript',
+              'ts': 'typescript',
+              'py': 'python',
+            };
+            language = languageMap[language.toLowerCase()] || language;
+
+            // 使用 CodeBlock 组件进行语法高亮
+            return <CodeBlock language={language}>{codeString}</CodeBlock>;
+          },
+          pre: ({ children }: any) => {
+            // pre 组件包裹代码块，直接返回 children（code 组件已经处理了）
+            // 这样可以避免双重包裹
+            return <>{children}</>;
           },
           h1: ({ children }) => (
             <h1 className="text-3xl font-bold mt-8 mb-4" style={{ color: 'var(--text-primary)' }}>{children}</h1>

@@ -20,21 +20,23 @@ export default function ChapterList() {
 
     return (
       <div className="max-w-4xl mx-auto">
-        <div className="mb-6">
+        <div className="mb-6 space-y-4">
           <Link
             to="/chapters"
-            className="inline-flex items-center space-x-2 text-sm font-medium mb-4"
+            className="soft-button inline-flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium"
             style={{ color: 'var(--accent)' }}
           >
             <ArrowLeft className="h-4 w-4" />
             <span>返回章节列表</span>
           </Link>
-          <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
-            第 {chapter.id} 章：{chapter.title}
-          </h1>
-          <p style={{ color: 'var(--text-secondary)' }}>
-            共 {chapter.sections.length} 个小节
-          </p>
+          <div>
+            <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
+              第 {chapter.id} 章：{chapter.title}
+            </h1>
+            <p style={{ color: 'var(--text-secondary)' }}>
+              共 {chapter.sections.length} 个小节
+            </p>
+          </div>
         </div>
 
         <div className="soft-card p-6 md:p-8">
