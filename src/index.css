@@ -3,8 +3,129 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* 浅色主题 Soft UI */
+    --bg-primary: #e0e5ec;
+    --bg-secondary: #f0f4f8;
+    --text-primary: #2d3748;
+    --text-secondary: #4a5568;
+    --shadow-light: #ffffff;
+    --shadow-dark: #a3b1c6;
+    --accent: #667eea;
+    --accent-hover: #764ba2;
+  }
+
+  [data-theme='dark'] {
+    /* 深色主题 Soft UI */
+    --bg-primary: #1a202c;
+    --bg-secondary: #2d3748;
+    --text-primary: #f7fafc;
+    --text-secondary: #e2e8f0;
+    --shadow-light: #2d3748;
+    --shadow-dark: #0f1419;
+    --accent: #667eea;
+    --accent-hover: #764ba2;
+  }
+
   body {
-    @apply bg-gray-50 text-gray-900;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+@layer utilities {
+  /* Soft UI 凸起效果 */
+  .soft-raised {
+    background: var(--bg-secondary);
+    border-radius: 1rem;
+    box-shadow: 
+      8px 8px 16px var(--shadow-dark),
+      -8px -8px 16px var(--shadow-light);
+  }
+
+  /* Soft UI 凹陷效果 */
+  .soft-inset {
+    background: var(--bg-secondary);
+    border-radius: 1rem;
+    box-shadow: 
+      inset 8px 8px 16px var(--shadow-dark),
+      inset -8px -8px 16px var(--shadow-light);
+  }
+
+  /* Soft UI 按钮 */
+  .soft-button {
+    background: var(--bg-secondary);
+    border-radius: 0.75rem;
+    box-shadow: 
+      6px 6px 12px var(--shadow-dark),
+      -6px -6px 12px var(--shadow-light);
+    transition: all 0.3s ease;
+  }
+
+  .soft-button:hover {
+    box-shadow: 
+      4px 4px 8px var(--shadow-dark),
+      -4px -4px 8px var(--shadow-light);
+  }
+
+  .soft-button:active {
+    box-shadow: 
+      inset 4px 4px 8px var(--shadow-dark),
+      inset -4px -4px 8px var(--shadow-light);
+  }
+
+  /* Soft UI 卡片 */
+  .soft-card {
+    background: var(--bg-secondary);
+    border-radius: 1.5rem;
+    box-shadow: 
+      12px 12px 24px var(--shadow-dark),
+      -12px -12px 24px var(--shadow-light);
+    transition: all 0.3s ease;
+  }
+
+  .soft-card:hover {
+    box-shadow: 
+      8px 8px 16px var(--shadow-dark),
+      -8px -8px 16px var(--shadow-light);
+    transform: translateY(-2px);
+  }
+
+  /* Soft UI 输入框 */
+  .soft-input {
+    background: var(--bg-secondary);
+    border-radius: 0.75rem;
+    box-shadow: 
+      inset 4px 4px 8px var(--shadow-dark),
+      inset -4px -4px 8px var(--shadow-light);
+    border: none;
+    outline: none;
+  }
+
+  /* 主题切换按钮 */
+  .theme-toggle {
+    background: var(--bg-secondary);
+    border-radius: 50%;
+    width: 3rem;
+    height: 3rem;
+    box-shadow: 
+      6px 6px 12px var(--shadow-dark),
+      -6px -6px 12px var(--shadow-light);
+    transition: all 0.3s ease;
+  }
+
+  .theme-toggle:hover {
+    box-shadow: 
+      4px 4px 8px var(--shadow-dark),
+      -4px -4px 8px var(--shadow-light);
+  }
+
+  .theme-toggle:active {
+    box-shadow: 
+      inset 4px 4px 8px var(--shadow-dark),
+      inset -4px -4px 8px var(--shadow-light);
   }
 }
 
@@ -14,47 +135,75 @@
   }
   
   .prose h1 {
-    @apply text-3xl font-bold mt-8 mb-4 text-gray-900;
+    @apply text-3xl font-bold mt-8 mb-4;
+    color: var(--text-primary);
   }
   
   .prose h2 {
-    @apply text-2xl font-semibold mt-6 mb-3 text-gray-800;
+    @apply text-2xl font-semibold mt-6 mb-3;
+    color: var(--text-primary);
   }
   
   .prose h3 {
-    @apply text-xl font-semibold mt-4 mb-2 text-gray-700;
+    @apply text-xl font-semibold mt-4 mb-2;
+    color: var(--text-primary);
   }
   
   .prose p {
-    @apply mb-4 text-gray-700 leading-relaxed;
+    @apply mb-4 leading-relaxed;
+    color: var(--text-primary);
   }
   
   .prose code {
-    @apply bg-gray-100 px-1.5 py-0.5 rounded text-sm font-mono text-pink-600;
+    @apply px-1.5 py-0.5 rounded text-sm font-mono;
+    background: var(--bg-primary);
+    color: var(--accent);
+    box-shadow: 
+      inset 2px 2px 4px var(--shadow-dark),
+      inset -2px -2px 4px var(--shadow-light);
   }
   
   .prose pre {
-    @apply bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto mb-4;
+    @apply p-4 rounded-lg overflow-x-auto mb-4;
+    background: var(--bg-secondary);
+    box-shadow: 
+      inset 4px 4px 8px var(--shadow-dark),
+      inset -4px -4px 8px var(--shadow-light);
   }
   
   .prose pre code {
-    @apply bg-transparent text-gray-100 p-0;
+    @apply bg-transparent p-0;
+    box-shadow: none;
+    color: var(--text-primary);
   }
   
   .prose ul {
     @apply list-disc list-inside mb-4 space-y-2;
+    color: var(--text-primary);
   }
   
   .prose ol {
     @apply list-decimal list-inside mb-4 space-y-2;
+    color: var(--text-primary);
   }
   
   .prose a {
-    @apply text-primary-600 hover:text-primary-700 underline;
+    color: var(--accent);
+    text-decoration: underline;
+    transition: color 0.3s ease;
+  }
+  
+  .prose a:hover {
+    color: var(--accent-hover);
   }
   
   .prose blockquote {
-    @apply border-l-4 border-primary-500 pl-4 italic my-4 text-gray-600;
+    @apply border-l-4 pl-4 italic my-4 py-2 rounded-r-lg;
+    background: var(--bg-primary);
+    border-color: var(--accent);
+    color: var(--text-secondary);
+    box-shadow: 
+      inset 2px 2px 4px var(--shadow-dark),
+      inset -2px -2px 4px var(--shadow-light);
   }
 }
-

@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom'
-import { ChevronRight, BookOpen } from 'lucide-react'
+import { ChevronRight, BookOpen, ArrowLeft } from 'lucide-react'
 import { chapters, getChapterById } from '../data/chapters'
 
 export default function ChapterList() {
@@ -10,8 +10,8 @@ export default function ChapterList() {
     if (!chapter) {
       return (
         <div className="text-center py-12">
-          <p className="text-gray-500">章节不存在</p>
-          <Link to="/chapters" className="text-primary-600 hover:text-primary-700 mt-4 inline-block">
+          <p style={{ color: 'var(--text-secondary)' }}>章节不存在</p>
+          <Link to="/chapters" className="mt-4 inline-block" style={{ color: 'var(--accent)' }}>
             返回章节列表
           </Link>
         </div>
@@ -23,38 +23,40 @@ export default function ChapterList() {
         <div className="mb-6">
           <Link
             to="/chapters"
-            className="text-primary-600 hover:text-primary-700 text-sm font-medium mb-4 inline-block"
+            className="inline-flex items-center space-x-2 text-sm font-medium mb-4"
+            style={{ color: 'var(--accent)' }}
           >
-            ← 返回章节列表
+            <ArrowLeft className="h-4 w-4" />
+            <span>返回章节列表</span>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mt-2">
+          <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
             第 {chapter.id} 章：{chapter.title}
           </h1>
-          <p className="text-gray-600 mt-2">
+          <p style={{ color: 'var(--text-secondary)' }}>
             共 {chapter.sections.length} 个小节
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 divide-y divide-gray-200">
+        <div className="soft-card divide-y" style={{ borderColor: 'transparent' }}>
           {chapter.sections.map((section, index) => (
             <Link
               key={section.id}
               to={section.path}
-              className="block p-6 hover:bg-gray-50 transition-colors"
+              className="block p-6 soft-raised rounded-xl mb-2 last:mb-0"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <div className="flex-shrink-0 w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
-                    <span className="text-primary-600 font-semibold">{index + 1}</span>
+                  <div className="soft-inset w-12 h-12 rounded-lg flex items-center justify-center">
+                    <span className="font-semibold" style={{ color: 'var(--accent)' }}>{index + 1}</span>
                   </div>
                   <div>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-medium text-gray-500">{section.id}</span>
-                      <h3 className="text-lg font-semibold text-gray-900">{section.title}</h3>
+                    <div className="flex items-center space-x-2 mb-1">
+                      <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>{section.id}</span>
                     </div>
+                    <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>{section.title}</h3>
                   </div>
                 </div>
-                <ChevronRight className="h-5 w-5 text-gray-400" />
+                <ChevronRight className="h-5 w-5" style={{ color: 'var(--text-secondary)' }} />
               </div>
             </Link>
           ))}
@@ -66,8 +68,8 @@ export default function ChapterList() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">所有章节</h1>
-        <p className="text-gray-600">
+        <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>所有章节</h1>
+        <p style={{ color: 'var(--text-secondary)' }}>
           选择章节开始学习，共 {chapters.length} 个章节
         </p>
       </div>
@@ -77,22 +79,22 @@ export default function ChapterList() {
           <Link
             key={chapter.id}
             to={`/chapter/${chapter.id}`}
-            className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:border-primary-300 hover:shadow-md transition-all"
+            className="soft-card p-6 block"
           >
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
-                  <BookOpen className="h-6 w-6 text-primary-600" />
+                <div className="soft-raised p-3 rounded-lg">
+                  <BookOpen className="h-6 w-6" style={{ color: 'var(--accent)' }} />
                 </div>
                 <div>
-                  <div className="text-sm font-medium text-primary-600">第 {chapter.id} 章</div>
-                  <h2 className="text-xl font-bold text-gray-900 mt-1">{chapter.title}</h2>
+                  <div className="text-sm font-medium" style={{ color: 'var(--accent)' }}>第 {chapter.id} 章</div>
+                  <h2 className="text-xl font-bold mt-1" style={{ color: 'var(--text-primary)' }}>{chapter.title}</h2>
                 </div>
               </div>
             </div>
-            <div className="flex items-center justify-between text-sm text-gray-500">
-              <span>{chapter.sections.length} 个小节</span>
-              <ChevronRight className="h-4 w-4" />
+            <div className="flex items-center justify-between text-sm">
+              <span style={{ color: 'var(--text-secondary)' }}>{chapter.sections.length} 个小节</span>
+              <ChevronRight className="h-4 w-4" style={{ color: 'var(--text-secondary)' }} />
             </div>
           </Link>
         ))}
@@ -100,4 +102,3 @@ export default function ChapterList() {
     </div>
   )
 }
-
