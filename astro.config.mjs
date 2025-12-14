@@ -1,8 +1,7 @@
+import { fileURLToPath } from 'node:url';
 import sitemap from '@astrojs/sitemap';
 import tailwind from '@astrojs/tailwind';
-// @ts-check
 import { defineConfig } from 'astro/config';
-import { fileURLToPath } from 'node:url';
 import remarkGfm from 'remark-gfm';
 import markdownImageSizing from './astro-src/remark/markdownImageSizing.mjs';
 import rewriteMarkdownImages from './astro-src/remark/rewriteMarkdownImages.mjs';
