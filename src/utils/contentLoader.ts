@@ -7,7 +7,7 @@ export interface SectionContent {
 }
 
 function normalizeMarkdownContent(markdown: string): string {
-  // 将相邻“纯图片段落”合并为同一个段落，便于页面把多张图片（如章节底部二维码）排成同一行。
+  // 将相邻"纯图片段落"合并为同一个段落，便于页面把多张图片（如章节底部二维码）排成同一行。
   // 典型输入：
   // ![](a)
   //
@@ -15,10 +15,20 @@ function normalizeMarkdownContent(markdown: string): string {
   // 输出（去掉空行）：
   // ![](a)
   // ![](b)
-  return markdown.replace(
-    /(^!\[[^\]]*\]\([^)]+\)\s*)\n(?:[ \t]*\n)+(?=!\[[^\]]*\]\([^)]+\))/gm,
-    '$1\n'
-  );
+  // 
+  // 策略：匹配"图片行 + 一个或多个空行 + 图片行"，把中间的空行都去掉
+  // 循环替换直到没有更多可合并的（支持3张以上图片）
+  let result = markdown;
+  let prev;
+  do {
+    prev = result;
+    result = result.replace(
+      /(!\[[^\]]*\]\([^)]+\))\s*\n\s*\n+\s*(!\[[^\]]*\]\([^)]+\))/g,
+      '$1\n$2'
+    );
+  } while (result !== prev);
+  
+  return result;
 }
 
 // 动态导入Markdown内容

@@ -149,7 +149,7 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
                 loading="lazy"
                 decoding="async"
                 className="soft-raised p-3 rounded-2xl h-auto"
-                style={{ maxWidth: 320, width: '100%' }}
+                style={{ maxWidth: '220px', width: '100%', flexShrink: 0 }}
               />
             );
           },
@@ -227,13 +227,18 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
             // 若段落只包含图片（常见于章节底部的两张二维码），则改为网格布局，尽量同排显示
             const childArr = Array.isArray(children) ? children : [children];
             const meaningful = childArr.filter((c) => !(typeof c === 'string' && c.trim() === ''));
+            // 检测是否只包含图片：React 元素且有 src 和 alt props（更可靠）
             const imageOnly =
               meaningful.length > 0 &&
-              meaningful.every((c) => isValidElement(c) && c.type === 'img');
+              meaningful.every((c) => {
+                if (!isValidElement(c) || !c.props || typeof c.props !== 'object') return false;
+                const props = c.props as Record<string, unknown>;
+                return 'src' in props || 'alt' in props;
+              });
 
             if (imageOnly) {
               return (
-                <div className="my-10 flex flex-wrap justify-center gap-6">
+                <div className="my-6 flex flex-wrap justify-center gap-6">
                   {meaningful}
                 </div>
               );
