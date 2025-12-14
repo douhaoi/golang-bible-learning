@@ -15,7 +15,7 @@
     --accent-hover: #5568d3;
   }
 
-  [data-theme='dark'] {
+  [data-theme="dark"] {
     /* 深色主题 Soft UI - 优化配色 */
     --bg-primary: #1e293b;
     --bg-secondary: #2d3748;
@@ -40,31 +40,25 @@
   .soft-raised {
     background: var(--bg-secondary);
     border-radius: 1rem;
-    box-shadow: 
-      3px 3px 6px var(--shadow-dark),
-      -3px -3px 6px var(--shadow-light);
+    box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
   }
 
   /* Soft UI 凹陷效果 - 更微妙的阴影 */
   .soft-inset {
     background: var(--bg-secondary);
     border-radius: 1rem;
-    box-shadow: 
-      inset 2px 2px 4px var(--shadow-dark),
-      inset -2px -2px 4px var(--shadow-light);
+    box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
   }
 
   /* 代码块专用 Soft UI 样式 */
   .code-block-soft {
     background: var(--bg-secondary);
     border-radius: 1.25rem;
-    box-shadow: 
-      inset 3px 3px 6px var(--shadow-dark),
-      inset -3px -3px 6px var(--shadow-light);
+    box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
     border: 1px solid rgba(0, 0, 0, 0.03);
   }
 
-  [data-theme='dark'] .code-block-soft {
+  [data-theme="dark"] .code-block-soft {
     border-color: rgba(255, 255, 255, 0.03);
   }
 
@@ -72,24 +66,18 @@
   .soft-button {
     background: var(--bg-secondary);
     border-radius: 0.75rem;
-    box-shadow: 
-      2px 2px 4px var(--shadow-dark),
-      -2px -2px 4px var(--shadow-light);
+    box-shadow: 2px 2px 4px var(--shadow-dark), -2px -2px 4px var(--shadow-light);
     transition: all 0.2s ease;
     border: 1px solid transparent;
   }
 
   .soft-button:hover {
-    box-shadow: 
-      1px 1px 3px var(--shadow-dark),
-      -1px -1px 3px var(--shadow-light);
+    box-shadow: 1px 1px 3px var(--shadow-dark), -1px -1px 3px var(--shadow-light);
     transform: translateY(-1px);
   }
 
   .soft-button:active {
-    box-shadow: 
-      inset 2px 2px 4px var(--shadow-dark),
-      inset -2px -2px 4px var(--shadow-light);
+    box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
     transform: translateY(0);
   }
 
@@ -97,21 +85,17 @@
   .soft-card {
     background: var(--bg-secondary);
     border-radius: 1.5rem;
-    box-shadow: 
-      4px 4px 8px var(--shadow-dark),
-      -4px -4px 8px var(--shadow-light);
+    box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid rgba(0, 0, 0, 0.05);
   }
 
-  [data-theme='dark'] .soft-card {
+  [data-theme="dark"] .soft-card {
     border-color: rgba(255, 255, 255, 0.05);
   }
 
   .soft-card:hover {
-    box-shadow: 
-      3px 3px 6px var(--shadow-dark),
-      -3px -3px 6px var(--shadow-light);
+    box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
     transform: translateY(-2px);
   }
 
@@ -119,9 +103,7 @@
   .soft-input {
     background: var(--bg-secondary);
     border-radius: 0.75rem;
-    box-shadow: 
-      inset 2px 2px 4px var(--shadow-dark),
-      inset -2px -2px 4px var(--shadow-light);
+    box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
     border: 1px solid transparent;
     outline: none;
   }
@@ -132,24 +114,18 @@
     border-radius: 50%;
     width: 3rem;
     height: 3rem;
-    box-shadow: 
-      2px 2px 4px var(--shadow-dark),
-      -2px -2px 4px var(--shadow-light);
+    box-shadow: 2px 2px 4px var(--shadow-dark), -2px -2px 4px var(--shadow-light);
     transition: all 0.2s ease;
     border: 1px solid transparent;
   }
 
   .theme-toggle:hover {
-    box-shadow: 
-      1px 1px 3px var(--shadow-dark),
-      -1px -1px 3px var(--shadow-light);
+    box-shadow: 1px 1px 3px var(--shadow-dark), -1px -1px 3px var(--shadow-light);
     transform: scale(1.05);
   }
 
   .theme-toggle:active {
-    box-shadow: 
-      inset 2px 2px 4px var(--shadow-dark),
-      inset -2px -2px 4px var(--shadow-light);
+    box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
     transform: scale(0.95);
   }
 }
@@ -158,47 +134,43 @@
   .prose {
     @apply max-w-none;
   }
-  
+
   .prose h1 {
     @apply text-3xl font-bold mt-8 mb-4;
     color: var(--text-primary);
   }
-  
+
   .prose h2 {
     @apply text-2xl font-semibold mt-6 mb-3;
     color: var(--text-primary);
   }
-  
+
   .prose h3 {
     @apply text-xl font-semibold mt-4 mb-2;
     color: var(--text-primary);
   }
-  
+
   .prose p {
     @apply mb-4 leading-relaxed;
     color: var(--text-primary);
   }
-  
+
   /* 行内代码样式 - 只影响不在 pre 中的 code 元素 */
   .prose :not(pre) > code:not([data-codeblock]) {
     @apply px-1.5 py-0.5 rounded text-sm font-mono inline-block;
     background: var(--bg-secondary);
     color: var(--accent);
-    box-shadow: 
-      inset 1px 1px 2px var(--shadow-dark),
-      inset -1px -1px 2px var(--shadow-light);
+    box-shadow: inset 1px 1px 2px var(--shadow-dark), inset -1px -1px 2px var(--shadow-light);
   }
-  
+
   .prose pre {
     @apply p-4 rounded-lg overflow-x-auto mb-4;
     background: var(--bg-secondary);
-    box-shadow: 
-      inset 2px 2px 4px var(--shadow-dark),
-      inset -2px -2px 4px var(--shadow-light);
+    box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
     border: 1px solid rgba(0, 0, 0, 0.05);
   }
 
-  [data-theme='dark'] .prose pre {
+  [data-theme="dark"] .prose pre {
     border-color: rgba(255, 255, 255, 0.05);
   }
 
@@ -208,40 +180,38 @@
   .prose pre code {
     background: transparent !important;
   }
-  
+
   .prose pre code {
     @apply bg-transparent p-0;
     box-shadow: none;
     color: var(--text-primary);
   }
-  
+
   .prose ul {
     @apply list-disc list-inside mb-4 space-y-2;
     color: var(--text-primary);
   }
-  
+
   .prose ol {
     @apply list-decimal list-inside mb-4 space-y-2;
     color: var(--text-primary);
   }
-  
+
   .prose a {
     color: var(--accent);
     text-decoration: underline;
     transition: color 0.3s ease;
   }
-  
+
   .prose a:hover {
     color: var(--accent-hover);
   }
-  
+
   .prose blockquote {
     @apply border-l-4 pl-4 italic my-4 py-2 rounded-r-lg;
     background: var(--bg-primary);
     border-color: var(--accent);
     color: var(--text-secondary);
-    box-shadow: 
-      inset 1px 1px 2px var(--shadow-dark),
-      inset -1px -1px 2px var(--shadow-light);
+    box-shadow: inset 1px 1px 2px var(--shadow-dark), inset -1px -1px 2px var(--shadow-light);
   }
 }

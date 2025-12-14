@@ -1,0 +1,15 @@
+#!/bin/sh
+# 示例 pre-commit hook
+# 如需使用，请安装 husky: pnpm add -D husky
+# 然后运行: pnpm exec husky install
+
+# 运行 TypeScript 类型检查
+echo "🔍 运行 TypeScript 类型检查..."
+pnpm exec tsc --noEmit || exit 1
+
+# 运行 ESLint
+echo "🔍 运行 ESLint..."
+pnpm run lint || exit 1
+
+echo "✅ 代码检查通过！"
+

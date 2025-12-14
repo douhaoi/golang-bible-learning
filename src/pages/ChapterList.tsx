@@ -1,12 +1,12 @@
-import { useParams, Link } from 'react-router-dom'
-import { ChevronRight, BookOpen, ArrowLeft } from 'lucide-react'
-import { chapters, getChapterById } from '../data/chapters'
+import { ArrowLeft, BookOpen, ChevronRight } from 'lucide-react';
+import { Link, useParams } from 'react-router-dom';
+import { chapters, getChapterById } from '../data/chapters';
 
 export default function ChapterList() {
-  const { chapterId } = useParams<{ chapterId?: string }>()
+  const { chapterId } = useParams<{ chapterId?: string }>();
 
   if (chapterId) {
-    const chapter = getChapterById(chapterId)
+    const chapter = getChapterById(chapterId);
     if (!chapter) {
       return (
         <div className="text-center py-12">
@@ -15,7 +15,7 @@ export default function ChapterList() {
             返回章节列表
           </Link>
         </div>
-      )
+      );
     }
 
     return (
@@ -33,9 +33,7 @@ export default function ChapterList() {
             <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
               第 {chapter.id} 章：{chapter.title}
             </h1>
-            <p style={{ color: 'var(--text-secondary)' }}>
-              共 {chapter.sections.length} 个小节
-            </p>
+            <p style={{ color: 'var(--text-secondary)' }}>共 {chapter.sections.length} 个小节</p>
           </div>
         </div>
 
@@ -47,32 +45,46 @@ export default function ChapterList() {
                 to={section.path}
                 className="block p-5 md:p-6 soft-raised rounded-xl transition-all duration-200 hover:scale-[1.02]"
               >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="soft-inset w-12 h-12 rounded-lg flex items-center justify-center">
-                    <span className="font-semibold" style={{ color: 'var(--accent)' }}>{index + 1}</span>
-                  </div>
-                  <div>
-                    <div className="flex items-center space-x-2 mb-1">
-                      <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>{section.id}</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="soft-inset w-12 h-12 rounded-lg flex items-center justify-center">
+                      <span className="font-semibold" style={{ color: 'var(--accent)' }}>
+                        {index + 1}
+                      </span>
                     </div>
-                    <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>{section.title}</h3>
+                    <div>
+                      <div className="flex items-center space-x-2 mb-1">
+                        <span
+                          className="text-sm font-medium"
+                          style={{ color: 'var(--text-secondary)' }}
+                        >
+                          {section.id}
+                        </span>
+                      </div>
+                      <h3
+                        className="text-lg font-semibold"
+                        style={{ color: 'var(--text-primary)' }}
+                      >
+                        {section.title}
+                      </h3>
+                    </div>
                   </div>
+                  <ChevronRight className="h-5 w-5" style={{ color: 'var(--text-secondary)' }} />
                 </div>
-                <ChevronRight className="h-5 w-5" style={{ color: 'var(--text-secondary)' }} />
-              </div>
               </Link>
             ))}
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>所有章节</h1>
+        <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
+          所有章节
+        </h1>
         <p style={{ color: 'var(--text-secondary)' }}>
           选择章节开始学习，共 {chapters.length} 个章节
         </p>
@@ -80,29 +92,31 @@ export default function ChapterList() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
         {chapters.map((chapter) => (
-          <Link
-            key={chapter.id}
-            to={`/chapter/${chapter.id}`}
-            className="soft-card p-6 block"
-          >
+          <Link key={chapter.id} to={`/chapter/${chapter.id}`} className="soft-card p-6 block">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center space-x-3">
                 <div className="soft-raised p-3 rounded-lg">
                   <BookOpen className="h-6 w-6" style={{ color: 'var(--accent)' }} />
                 </div>
                 <div>
-                  <div className="text-sm font-medium" style={{ color: 'var(--accent)' }}>第 {chapter.id} 章</div>
-                  <h2 className="text-xl font-bold mt-1" style={{ color: 'var(--text-primary)' }}>{chapter.title}</h2>
+                  <div className="text-sm font-medium" style={{ color: 'var(--accent)' }}>
+                    第 {chapter.id} 章
+                  </div>
+                  <h2 className="text-xl font-bold mt-1" style={{ color: 'var(--text-primary)' }}>
+                    {chapter.title}
+                  </h2>
                 </div>
               </div>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <span style={{ color: 'var(--text-secondary)' }}>{chapter.sections.length} 个小节</span>
+              <span style={{ color: 'var(--text-secondary)' }}>
+                {chapter.sections.length} 个小节
+              </span>
               <ChevronRight className="h-4 w-4" style={{ color: 'var(--text-secondary)' }} />
             </div>
           </Link>
         ))}
       </div>
     </div>
-  )
+  );
 }

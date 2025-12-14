@@ -15,11 +15,11 @@ function normalizeMarkdownContent(markdown: string): string {
   // 输出（去掉空行）：
   // ![](a)
   // ![](b)
-  // 
+  //
   // 策略：匹配"图片行 + 一个或多个空行 + 图片行"，把中间的空行都去掉
   // 循环替换直到没有更多可合并的（支持3张以上图片）
   let result = markdown;
-  let prev;
+  let prev: string;
   do {
     prev = result;
     result = result.replace(
@@ -27,7 +27,7 @@ function normalizeMarkdownContent(markdown: string): string {
       '$1\n$2'
     );
   } while (result !== prev);
-  
+
   return result;
 }
 
@@ -35,7 +35,7 @@ function normalizeMarkdownContent(markdown: string): string {
 export async function loadSectionContent(sectionId: string): Promise<SectionContent | null> {
   // 将 sectionId 转换为文件名格式 (例如: 1.1 -> 1-1)
   const fileName = sectionId.replace(/\./g, '-');
-  
+
   try {
     // 优先使用 fetch 加载（开发和生产环境都支持）
     // 使用 import.meta.env.BASE_URL 确保在 GitHub Pages 子路径部署时路径正确
@@ -44,14 +44,14 @@ export async function loadSectionContent(sectionId: string): Promise<SectionCont
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const content = await response.text();
-    
+
     // 解析Markdown内容
     const lines = content.split('\n');
     const title = lines[0].replace(/^#+\s*/, '') || sectionId;
     const body = normalizeMarkdownContent(lines.slice(1).join('\n').trim());
-    
+
     return {
       sectionId,
       title,
@@ -63,11 +63,11 @@ export async function loadSectionContent(sectionId: string): Promise<SectionCont
       // 使用动态 import，Vite 会在运行时处理
       const module = await import(/* @vite-ignore */ `../content/${fileName}.md?raw`);
       const content = module.default as string;
-      
+
       const lines = content.split('\n');
       const title = lines[0].replace(/^#+\s*/, '') || sectionId;
       const body = normalizeMarkdownContent(lines.slice(1).join('\n').trim());
-      
+
       return {
         sectionId,
         title,
@@ -82,7 +82,7 @@ export async function loadSectionContent(sectionId: string): Promise<SectionCont
 }
 
 // 加载索引文件
-export async function loadContentIndex(): Promise<any> {
+export async function loadContentIndex(): Promise<unknown> {
   try {
     // 使用 fetch 而不是 import，避免构建时解析错误
     // 使用 import.meta.env.BASE_URL 确保在 GitHub Pages 子路径部署时路径正确
@@ -99,4 +99,3 @@ export async function loadContentIndex(): Promise<any> {
     return null;
   }
 }
-

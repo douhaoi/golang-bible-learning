@@ -1,15 +1,15 @@
-import { ReactNode } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { Book, Home, List, Sun, Moon } from 'lucide-react'
-import { useTheme } from '../contexts/ThemeContext'
+import { Book, Home, List, Moon, Sun } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface LayoutProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 export default function Layout({ children }: LayoutProps) {
-  const location = useLocation()
-  const { theme, toggleTheme } = useTheme()
+  const location = useLocation();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
@@ -29,9 +29,7 @@ export default function Layout({ children }: LayoutProps) {
               <Link
                 to="/"
                 className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
-                  location.pathname === '/'
-                    ? 'soft-inset'
-                    : 'soft-button'
+                  location.pathname === '/' ? 'soft-inset' : 'soft-button'
                 }`}
                 style={{ color: 'var(--text-primary)' }}
               >
@@ -41,7 +39,8 @@ export default function Layout({ children }: LayoutProps) {
               <Link
                 to="/chapters"
                 className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
-                  location.pathname.startsWith('/chapters') || location.pathname.startsWith('/chapter')
+                  location.pathname.startsWith('/chapters') ||
+                  location.pathname.startsWith('/chapter')
                     ? 'soft-inset'
                     : 'soft-button'
                 }`}
@@ -51,6 +50,7 @@ export default function Layout({ children }: LayoutProps) {
                 <span>章节</span>
               </Link>
               <button
+                type="button"
                 onClick={toggleTheme}
                 className="theme-toggle flex items-center justify-center"
                 aria-label="切换主题"
@@ -67,9 +67,7 @@ export default function Layout({ children }: LayoutProps) {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {children}
-      </main>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">{children}</main>
 
       {/* Footer */}
       <footer className="mt-12 py-6" style={{ backgroundColor: 'var(--bg-primary)' }}>
@@ -85,15 +83,24 @@ export default function Layout({ children }: LayoutProps) {
                 className="underline hover:opacity-80 transition-opacity"
               >
                 Go语言圣经
-              </a>
-              {' '}构建的学习站点
+              </a>{' '}
+              构建的学习站点
             </p>
             <p className="mt-2">
-              原版官网: <a href="http://gopl.io" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)' }} className="underline hover:opacity-80 transition-opacity">gopl.io</a>
+              原版官网:{' '}
+              <a
+                href="http://gopl.io"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'var(--accent)' }}
+                className="underline hover:opacity-80 transition-opacity"
+              >
+                gopl.io
+              </a>
             </p>
           </div>
         </div>
       </footer>
     </div>
-  )
+  );
 }

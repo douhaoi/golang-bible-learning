@@ -1,19 +1,20 @@
+import { Check, Copy, FileText, Terminal } from 'lucide-react';
+import { isValidElement, useMemo, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Copy, Check, Terminal, FileText } from 'lucide-react';
-import { useState, useMemo, isValidElement } from 'react';
+import { oneLight, vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import remarkGfm from 'remark-gfm';
 import { useTheme } from '../contexts/ThemeContext';
 
+import prismBash from 'react-syntax-highlighter/dist/esm/languages/prism/bash';
 // Prism 语言支持需要显式注册，否则即使 markdown 写了 ```go 也不会进行 token 高亮
 import prismGo from 'react-syntax-highlighter/dist/esm/languages/prism/go';
-import prismBash from 'react-syntax-highlighter/dist/esm/languages/prism/bash';
 import prismJavascript from 'react-syntax-highlighter/dist/esm/languages/prism/javascript';
-import prismTypescript from 'react-syntax-highlighter/dist/esm/languages/prism/typescript';
 import prismPython from 'react-syntax-highlighter/dist/esm/languages/prism/python';
+import prismTypescript from 'react-syntax-highlighter/dist/esm/languages/prism/typescript';
 
-// react-syntax-highlighter 的类型定义有时不暴露 registerLanguage，这里用 any 兼容
+// react-syntax-highlighter 的类型定义有时不暴露 registerLanguage，这里用 unknown 兼容
+// biome-ignore lint/suspicious/noExplicitAny: react-syntax-highlighter types limitation
 const PrismLightHighlighter = SyntaxHighlighter as any;
 PrismLightHighlighter.registerLanguage('go', prismGo);
 PrismLightHighlighter.registerLanguage('bash', prismBash);
@@ -68,6 +69,7 @@ function CodeBlock({ language, children }: { language: string; children: string 
     <div className="relative group my-6">
       <div className="absolute top-3 right-3 z-10">
         <button
+          type="button"
           onClick={handleCopy}
           className="soft-button flex items-center space-x-1 px-3 py-1.5 text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
           style={{ color: 'var(--text-primary)' }}
@@ -97,9 +99,7 @@ function CodeBlock({ language, children }: { language: string; children: string 
         >
           <div className="flex items-center gap-2 text-xs font-medium">
             <meta.Icon className="h-3.5 w-3.5" style={{ color: meta.accent }} />
-            <span style={{ color: 'var(--text-secondary)' }}>
-              {meta.label}
-            </span>
+            <span style={{ color: 'var(--text-secondary)' }}>{meta.label}</span>
           </div>
         </div>
         <div className="p-4 md:p-5">
@@ -115,11 +115,19 @@ function CodeBlock({ language, children }: { language: string; children: string 
             }}
             showLineNumbers={false}
             PreTag="div"
-            CodeTag={({ children, ...props }: any) => (
+            CodeTag={({
+              children,
+              style,
+              ...props
+            }: {
+              children: React.ReactNode;
+              style?: React.CSSProperties;
+              [key: string]: unknown;
+            }) => (
               <code
                 {...props}
                 data-codeblock="true"
-                style={{ ...props.style, background: 'transparent !important' }}
+                style={{ ...style, background: 'transparent !important' }}
               >
                 {children}
               </code>
@@ -140,7 +148,7 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          img: ({ src, alt }: any) => {
+          img: ({ src, alt }: { src?: string; alt?: string }) => {
             // 章节底部二维码等图片：限制尺寸 + 卡片化，避免撑满整行
             return (
               <img
@@ -153,7 +161,16 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
               />
             );
           },
-          code: ({ node, inline, className, children, ...props }: any) => {
+          code: ({
+            inline,
+            className,
+            children,
+            ...props
+          }: {
+            inline?: boolean;
+            className?: string;
+            children?: React.ReactNode;
+          }) => {
             // react-markdown v9 中，`inline` 可能不存在/不稳定。
             // 用更稳的规则区分：
             // - 行内代码通常没有换行
@@ -166,16 +183,16 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
             if (isInline) {
               // 行内代码：使用 Soft UI 凹陷样式，不进行语法高亮
               return (
-                <code 
-                  className="soft-inset px-1.5 py-0.5 rounded text-sm font-mono inline-block" 
-                  style={{ color: 'var(--accent)' }} 
+                <code
+                  className="soft-inset px-1.5 py-0.5 rounded text-sm font-mono inline-block"
+                  style={{ color: 'var(--accent)' }}
                   {...props}
                 >
                   {children}
                 </code>
               );
             }
-            
+
             // 代码块
             // 提取语言标识
             const match = /language-(\w+)/.exec(className || '');
@@ -184,12 +201,12 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
 
             // 语言别名映射
             const languageMap: Record<string, string> = {
-              'golang': 'go',
-              'sh': 'bash',
-              'shell': 'bash',
-              'js': 'javascript',
-              'ts': 'typescript',
-              'py': 'python',
+              golang: 'go',
+              sh: 'bash',
+              shell: 'bash',
+              js: 'javascript',
+              ts: 'typescript',
+              py: 'python',
             };
             // 统一标准化为小写：markdown 里常见 ```Go / ```JSON 等写法
             const normalized = (language || '').toLowerCase();
@@ -198,7 +215,9 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
             // 兜底：有些内容源会把 fenced code block“缩进/转义”，导致 ```bash 变成代码块内容的一部分。
             // 若检测到 codeString 本身就是 fenced block，则解包为真正的代码块再渲染。
             const maybeUnescaped = codeString.replace(/\\`\\`\\`/g, '```');
-            const nestedFence = /^```([A-Za-z0-9_-]+)?\n([\s\S]*?)\n```$/.exec(maybeUnescaped.trim());
+            const nestedFence = /^```([A-Za-z0-9_-]+)?\n([\s\S]*?)\n```$/.exec(
+              maybeUnescaped.trim()
+            );
             if (nestedFence) {
               const nestedLangRaw = (nestedFence[1] || '').toLowerCase();
               const nestedLang = languageMap[nestedLangRaw] || nestedLangRaw || 'text';
@@ -209,19 +228,31 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
             // 使用 CodeBlock 组件进行语法高亮
             return <CodeBlock language={language}>{codeString}</CodeBlock>;
           },
-          pre: ({ children }: any) => {
+          pre: ({ children }: { children?: React.ReactNode }) => {
             // pre 组件包裹代码块，直接返回 children（code 组件已经处理了）
             // 这样可以避免双重包裹
             return <>{children}</>;
           },
           h1: ({ children }) => (
-            <h1 className="text-3xl font-bold mt-8 mb-4" style={{ color: 'var(--text-primary)' }}>{children}</h1>
+            <h1 className="text-3xl font-bold mt-8 mb-4" style={{ color: 'var(--text-primary)' }}>
+              {children}
+            </h1>
           ),
           h2: ({ children }) => (
-            <h2 className="text-2xl font-semibold mt-6 mb-3" style={{ color: 'var(--text-primary)' }}>{children}</h2>
+            <h2
+              className="text-2xl font-semibold mt-6 mb-3"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              {children}
+            </h2>
           ),
           h3: ({ children }) => (
-            <h3 className="text-xl font-semibold mt-4 mb-2" style={{ color: 'var(--text-primary)' }}>{children}</h3>
+            <h3
+              className="text-xl font-semibold mt-4 mb-2"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              {children}
+            </h3>
           ),
           p: ({ children }) => {
             // 若段落只包含图片（常见于章节底部的两张二维码），则改为网格布局，尽量同排显示
@@ -237,11 +268,7 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
               });
 
             if (imageOnly) {
-              return (
-                <div className="my-6 flex flex-wrap justify-center gap-6">
-                  {meaningful}
-                </div>
-              );
+              return <div className="my-6 flex flex-wrap justify-center gap-6">{meaningful}</div>;
             }
 
             return (
@@ -251,21 +278,40 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
             );
           },
           ul: ({ children }) => (
-            <ul className="list-disc list-inside mb-4 space-y-2" style={{ color: 'var(--text-primary)' }}>{children}</ul>
+            <ul
+              className="list-disc list-inside mb-4 space-y-2"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              {children}
+            </ul>
           ),
           ol: ({ children }) => (
-            <ol className="list-decimal list-inside mb-4 space-y-2" style={{ color: 'var(--text-primary)' }}>{children}</ol>
+            <ol
+              className="list-decimal list-inside mb-4 space-y-2"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              {children}
+            </ol>
           ),
           a: ({ href, children }) => (
-            <a href={href} style={{ color: 'var(--accent)' }} className="underline hover:opacity-80 transition-opacity" target="_blank" rel="noopener noreferrer">
+            <a
+              href={href}
+              style={{ color: 'var(--accent)' }}
+              className="underline hover:opacity-80 transition-opacity"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               {children}
             </a>
           ),
           blockquote: ({ children }) => (
-            <blockquote className="border-l-4 pl-4 italic my-4 py-2 rounded-r-lg" style={{ 
-              borderColor: 'var(--accent)',
-              color: 'var(--text-secondary)',
-            }}>
+            <blockquote
+              className="border-l-4 pl-4 italic my-4 py-2 rounded-r-lg"
+              style={{
+                borderColor: 'var(--accent)',
+                color: 'var(--text-secondary)',
+              }}
+            >
               {children}
             </blockquote>
           ),
