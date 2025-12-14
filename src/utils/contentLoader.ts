@@ -37,10 +37,11 @@ export async function loadSectionContent(sectionId: string): Promise<SectionCont
   const fileName = sectionId.replace(/\./g, '-');
 
   try {
-    // 优先使用 fetch 加载（开发和生产环境都支持）
+    // 使用 fetch 加载 markdown 文件
+    // 文件在 public/content 目录中，构建后会被复制到 dist/content
     // 使用 import.meta.env.BASE_URL 确保在 GitHub Pages 子路径部署时路径正确
     const basePath = import.meta.env.BASE_URL || '/';
-    const response = await fetch(`${basePath}src/content/${fileName}.md`);
+    const response = await fetch(`${basePath}content/${fileName}.md`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -58,36 +59,20 @@ export async function loadSectionContent(sectionId: string): Promise<SectionCont
       content: body,
     };
   } catch (error) {
-    // 如果fetch失败，尝试使用动态import（仅在文件存在时）
-    try {
-      // 使用动态 import，Vite 会在运行时处理
-      const module = await import(/* @vite-ignore */ `../content/${fileName}.md?raw`);
-      const content = module.default as string;
-
-      const lines = content.split('\n');
-      const title = lines[0].replace(/^#+\s*/, '') || sectionId;
-      const body = normalizeMarkdownContent(lines.slice(1).join('\n').trim());
-
-      return {
-        sectionId,
-        title,
-        content: body,
-      };
-    } catch (importError) {
-      // 文件不存在时静默失败
-      console.warn(`无法加载内容 ${sectionId}（文件可能不存在，请先运行爬虫）`);
-      return null;
-    }
+    // 文件不存在时静默失败
+    console.warn(`无法加载内容 ${sectionId}（文件可能不存在，请先运行爬虫）`, error);
+    return null;
   }
 }
 
 // 加载索引文件
 export async function loadContentIndex(): Promise<unknown> {
   try {
-    // 使用 fetch 而不是 import，避免构建时解析错误
+    // 使用 fetch 加载 index.json
+    // 文件在 public/content 目录中，构建后会被复制到 dist/content
     // 使用 import.meta.env.BASE_URL 确保在 GitHub Pages 子路径部署时路径正确
     const basePath = import.meta.env.BASE_URL || '/';
-    const response = await fetch(`${basePath}src/content/index.json`);
+    const response = await fetch(`${basePath}content/index.json`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
