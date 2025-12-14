@@ -12,7 +12,9 @@ function App() {
     // 处理从 404.html 重定向来的路由
     const redirect = sessionStorage.redirect;
     if (redirect) {
+      // 清理 sessionStorage
       sessionStorage.redirect = undefined;
+      sessionStorage.removeItem('__spa_redirect_handled__');
       // 获取 basename
       const basename = import.meta.env.MODE === 'production' ? '/golang-bible-learning/' : '/';
       // 移除 basename 获取相对路径

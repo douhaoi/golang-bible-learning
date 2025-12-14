@@ -13,15 +13,20 @@
         document.documentElement.setAttribute('data-theme', theme);
       })();
 
-      // GitHub Pages SPA 路由处理
+      // GitHub Pages SPA 路由处理 - 仅在首次 404 时处理，避免重复执行
       (function() {
         const path = location.pathname;
         const base = '/golang-bible-learning/';
 
-        // 如果访问的路径不是根路径且不是文件，保存重定向信息
-        if (path !== base && !path.endsWith('.html') && !path.includes('.')) {
+        // 检查是否已经处理过了（sessionStorage 中有 redirect 或已标记处理过）
+        const alreadyHandled = sessionStorage.getItem('__spa_redirect_handled__');
+
+        // 如果访问的路径不是根路径且不是文件，且未处理过，则保存重定向信息
+        if (path !== base && !path.endsWith('.html') && !path.includes('.') && !alreadyHandled) {
           // 保存原始路径到 sessionStorage
           sessionStorage.redirect = path;
+          // 标记已处理，避免循环重定向
+          sessionStorage.setItem('__spa_redirect_handled__', 'true');
           // 重定向到根路径，让 React 应用处理路由
           location.href = base;
         }
