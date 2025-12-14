@@ -69,7 +69,7 @@ export default function SectionDetail() {
   return (
     <div className="flex gap-6 max-w-7xl mx-auto">
       {/* 左侧导航 */}
-      <SectionNav chapter={chapter} currentSectionId={sectionId || ''} />
+      <SectionNav currentSectionId={sectionId || ''} />
 
       {/* 主内容区域 */}
       <div className="flex-1 min-w-0 lg:ml-0 ml-0">

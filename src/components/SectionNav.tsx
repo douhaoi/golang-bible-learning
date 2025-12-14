@@ -1,19 +1,35 @@
-import { ChevronRight, Menu, X } from 'lucide-react';
+import { ChevronDown, ChevronRight, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import type { Chapter } from '../data/chapters';
+import { chapters } from '../data/chapters';
 
 interface SectionNavProps {
-  chapter: Chapter;
   currentSectionId: string;
 }
 
 /**
  * 章节导航侧边栏组件
- * 支持响应式设计，移动端可折叠
+ * 显示所有章节和小节，支持响应式设计
  */
-export default function SectionNav({ chapter, currentSectionId }: SectionNavProps) {
+export default function SectionNav({ currentSectionId }: SectionNavProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [expandedChapters, setExpandedChapters] = useState<Set<string>>(() => {
+    // 默认展开当前小节所在的章节
+    const currentChapterId = currentSectionId.split('.')[0];
+    return new Set([currentChapterId]);
+  });
+
+  const toggleChapter = (chapterId: string) => {
+    setExpandedChapters((prev) => {
+      const next = new Set(prev);
+      if (next.has(chapterId)) {
+        next.delete(chapterId);
+      } else {
+        next.add(chapterId);
+      }
+      return next;
+    });
+  };
 
   return (
     <>
@@ -44,65 +60,108 @@ export default function SectionNav({ chapter, currentSectionId }: SectionNavProp
       <aside
         className={`
           fixed lg:sticky top-0 left-0 h-screen z-40
-          w-72 lg:w-64 xl:w-72
+          w-80 lg:w-72 xl:w-80
           transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
       >
-        <nav className="h-full soft-card p-6 overflow-y-auto">
-          {/* 章节标题 */}
-          <div className="mb-6">
-            <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
-              第 {chapter.id} 章
+        <nav className="h-full soft-card p-4 overflow-y-auto">
+          {/* 标题 */}
+          <div className="mb-4 px-2">
+            <h2 className="text-base font-bold" style={{ color: 'var(--text-primary)' }}>
+              Go语言圣经
             </h2>
-            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-              {chapter.title}
+            <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+              全部章节
             </p>
           </div>
 
           {/* 分割线 */}
           <div className="h-px mb-4" style={{ background: 'var(--text-secondary)', opacity: 0.2 }} />
 
-          {/* 小节列表 */}
-          <ul className="space-y-1">
-            {chapter.sections.map((section) => {
-              const isActive = section.id === currentSectionId;
+          {/* 所有章节列表 */}
+          <ul className="space-y-2">
+            {chapters.map((chapter) => {
+              const isExpanded = expandedChapters.has(chapter.id);
+              const hasCurrentSection = chapter.sections.some(s => s.id === currentSectionId);
+              
               return (
-                <li key={section.id}>
-                  <Link
-                    to={section.path}
-                    onClick={() => setIsOpen(false)}
+                <li key={chapter.id}>
+                  {/* 章节标题（可折叠） */}
+                  <button
+                    type="button"
+                    onClick={() => toggleChapter(chapter.id)}
                     className={`
-                      group flex items-center justify-between
-                      px-3 py-2.5 rounded-lg
+                      w-full flex items-center justify-between
+                      px-3 py-2 rounded-lg
                       transition-all duration-200
-                      ${isActive ? 'soft-inset' : 'hover:soft-raised'}
+                      ${hasCurrentSection ? 'soft-raised' : 'hover:soft-raised'}
                     `}
                     style={{
-                      color: isActive ? 'var(--accent)' : 'var(--text-primary)',
+                      color: hasCurrentSection ? 'var(--accent)' : 'var(--text-primary)',
                     }}
                   >
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs mb-0.5 opacity-70">{section.id}</div>
-                      <div className="text-sm font-medium truncate">{section.title}</div>
+                    <div className="flex items-center space-x-2 flex-1 min-w-0">
+                      <span className="text-sm font-semibold">第 {chapter.id} 章</span>
+                      <span className="text-xs truncate" style={{ color: 'var(--text-secondary)' }}>
+                        {chapter.title}
+                      </span>
                     </div>
-                    <ChevronRight
+                    <ChevronDown
                       className={`
                         h-4 w-4 flex-shrink-0 ml-2
                         transition-transform duration-200
-                        ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}
+                        ${isExpanded ? 'rotate-180' : ''}
                       `}
                     />
-                  </Link>
+                  </button>
+
+                  {/* 小节列表（可折叠） */}
+                  {isExpanded && (
+                    <ul className="mt-1 ml-2 space-y-0.5">
+                      {chapter.sections.map((section) => {
+                        const isActive = section.id === currentSectionId;
+                        return (
+                          <li key={section.id}>
+                            <Link
+                              to={section.path}
+                              onClick={() => setIsOpen(false)}
+                              className={`
+                                group flex items-center justify-between
+                                px-3 py-2 rounded-lg
+                                transition-all duration-200
+                                ${isActive ? 'soft-inset' : 'hover:bg-opacity-50'}
+                              `}
+                              style={{
+                                color: isActive ? 'var(--accent)' : 'var(--text-primary)',
+                                backgroundColor: isActive ? 'transparent' : 'transparent',
+                              }}
+                            >
+                              <div className="flex-1 min-w-0">
+                                <div className="text-xs font-medium truncate">{section.title}</div>
+                              </div>
+                              <ChevronRight
+                                className={`
+                                  h-3 w-3 flex-shrink-0 ml-2
+                                  transition-all duration-200
+                                  ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}
+                                `}
+                              />
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
                 </li>
               );
             })}
           </ul>
 
-          {/* 章节统计 */}
+          {/* 底部统计 */}
           <div className="mt-6 pt-4" style={{ borderTop: '1px solid var(--shadow-dark)' }}>
-            <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-              共 {chapter.sections.length} 个小节
+            <div className="text-xs px-2" style={{ color: 'var(--text-secondary)' }}>
+              共 {chapters.length} 章 · {chapters.reduce((sum, ch) => sum + ch.sections.length, 0)} 节
             </div>
           </div>
         </nav>

@@ -8,12 +8,15 @@
 
 **位置**: `src/components/SectionNav.tsx`
 
-**功能**: 在左侧显示当前章节的所有小节，支持快速切换。
+**功能**: 在左侧显示所有章节和小节，支持全局快速导航。
 
 **特性**:
+- ✅ 显示所有14个章节
+- ✅ 章节可折叠/展开
+- ✅ 当前章节自动展开
+- ✅ 当前小节高亮显示
 - ✅ 固定在左侧（桌面端）
 - ✅ 可折叠菜单（移动端）
-- ✅ 当前小节高亮显示
 - ✅ 悬停效果
 - ✅ 响应式设计
 - ✅ Soft UI 样式
@@ -28,20 +31,22 @@
 ```tsx
 import SectionNav from '../components/SectionNav';
 
-<SectionNav 
-  chapter={chapter} 
-  currentSectionId={sectionId} 
-/>
+<SectionNav currentSectionId={sectionId} />
 ```
 
 **Props**:
 
 ```typescript
 interface SectionNavProps {
-  chapter: Chapter;       // 当前章节对象
   currentSectionId: string; // 当前小节 ID
 }
 ```
+
+**交互特性**:
+- 点击章节标题：展开/收起该章节的小节列表
+- 点击小节：跳转到对应内容
+- 默认展开：当前小节所在的章节
+- 移动端：点击遮罩层或 ESC 键关闭侧边栏
 
 ---
 
