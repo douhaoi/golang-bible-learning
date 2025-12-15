@@ -4,6 +4,10 @@ import { chapterTitles } from './chapterTitles';
 export type Chapter = {
   id: string;
   title: string;
+  intro?: {
+    entryId: string;
+    title: string;
+  };
   sections: Array<{
     id: string; // e.g. "1.7"
     title: string;
@@ -12,15 +16,35 @@ export type Chapter = {
   }>;
 };
 
-function parseSectionFromEntryId(entryId: string) {
-  // Expected id shape (glob loader): "ch1/ch1-07"
-  // Also tolerate: "ch1/ch1-07.md"
-  const m = /^ch(\d+)\/ch\1-(\d{2})(?:\.md)?$/.exec(entryId);
-  if (!m) return null;
-  const chapterId = String(Number(m[1]));
-  const sectionNum = Number(m[2]);
-  const sectionId = `${chapterId}.${sectionNum}`;
-  return { chapterId, sectionId, order: sectionNum };
+type ParsedEntry =
+  | {
+      kind: 'intro';
+      chapterId: string;
+    }
+  | {
+      kind: 'section';
+      chapterId: string;
+      sectionId: string;
+      order: number;
+    };
+
+function parseEntryId(entryId: string): ParsedEntry | null {
+  // Intro: "ch1/ch1.md"
+  const introMatch = /^ch(\d+)\/ch\1(?:\.md)?$/.exec(entryId);
+  if (introMatch) {
+    return { kind: 'intro', chapterId: String(Number(introMatch[1])) };
+  }
+
+  // Section: "ch1/ch1-07.md"
+  const sectionMatch = /^ch(\d+)\/ch\1-(\d{2})(?:\.md)?$/.exec(entryId);
+  if (sectionMatch) {
+    const chapterId = String(Number(sectionMatch[1]));
+    const sectionNum = Number(sectionMatch[2]);
+    const sectionId = `${chapterId}.${sectionNum}`;
+    return { kind: 'section', chapterId, sectionId, order: sectionNum };
+  }
+
+  return null;
 }
 
 function parseTitleFromMarkdownBody(body: string, fallback: string) {
@@ -37,11 +61,8 @@ export async function getChaptersFromContent(): Promise<Chapter[]> {
 
   const byChapter = new Map<string, Chapter>();
   for (const entry of entries) {
-    const parsed = parseSectionFromEntryId(entry.id);
+    const parsed = parseEntryId(entry.id);
     if (!parsed) continue;
-
-    const titleFallback = parsed.sectionId;
-    const title = parseTitleFromMarkdownBody(entry.body ?? '', titleFallback);
 
     const chapter =
       byChapter.get(parsed.chapterId) ??
@@ -55,12 +76,19 @@ export async function getChaptersFromContent(): Promise<Chapter[]> {
         return created;
       })();
 
-    chapter.sections.push({
-      id: parsed.sectionId,
-      title,
-      entryId: entry.id,
-      order: parsed.order,
-    });
+    if (parsed.kind === 'intro') {
+      const title = parseTitleFromMarkdownBody(entry.body ?? '', chapter.title);
+      chapter.intro = { entryId: entry.id, title };
+    } else {
+      const titleFallback = parsed.sectionId;
+      const title = parseTitleFromMarkdownBody(entry.body ?? '', titleFallback);
+      chapter.sections.push({
+        id: parsed.sectionId,
+        title,
+        entryId: entry.id,
+        order: parsed.order,
+      });
+    }
   }
 
   const chapters = Array.from(byChapter.values()).sort((a, b) => Number(a.id) - Number(b.id));

@@ -1,5 +1,7 @@
 ---
+import { getEntry, render } from 'astro:content';
 import LucideIcon from '@/components/LucideIcon.astro';
+import SectionNav from '@/components/SectionNav.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getChapterFromContent, getChaptersFromContent } from '@/lib/contentChapters';
 import { sectionUrl } from '@/lib/urls';
@@ -10,9 +12,20 @@ export async function getStaticPaths() {
 }
 
 const { chapterId } = Astro.params;
-const chapter = await getChapterFromContent(chapterId);
+const [chapter, chapters] = await Promise.all([
+  getChapterFromContent(chapterId),
+  getChaptersFromContent(),
+]);
 if (!chapter) {
   throw new Error(`Chapter not found: ${chapterId}`);
+}
+
+let IntroContent: any = null;
+if (chapter.intro) {
+  const introEntry = await getEntry('sections', chapter.intro.entryId);
+  if (!introEntry) throw new Error(`Intro not found for chapter ${chapter.id}`);
+  const rendered = await render(introEntry);
+  IntroContent = rendered.Content;
 }
 ---
 
@@ -20,51 +33,64 @@ if (!chapter) {
   title={`第 ${chapter.id} 章 - ${chapter.title} - Go语言圣经`}
   description={`第 ${chapter.id} 章：${chapter.title}（共 ${chapter.sections.length} 小节）。`}
 >
-  <div class="max-w-4xl mx-auto">
-    <div class="mb-6 space-y-4">
-      <a
-        href="chapters/"
-        class="soft-button inline-flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium"
-        style="color: var(--accent);"
-      >
-        <LucideIcon name="arrow-left" class="h-4 w-4" />
-        <span>返回章节列表</span>
-      </a>
-      <div>
-        <h1 class="text-4xl font-bold mb-2" style="color: var(--text-primary);">
-          第 {chapter.id} 章：{chapter.title}
-        </h1>
-        <p style="color: var(--text-secondary);">共 {chapter.sections.length} 个小节</p>
-      </div>
-    </div>
+  <div class="flex gap-6 max-w-7xl mx-auto">
+    <SectionNav
+      chapters={chapters}
+      currentSectionId={`${chapter.id}.intro`}
+    />
 
-    <div class="soft-card p-6 md:p-8">
-      <div class="space-y-4">
-        {chapter.sections.map((section, index) => (
-          <a
-            href={sectionUrl(chapter.id, section.id)}
-            class="block p-5 md:p-6 soft-raised rounded-xl transition-all duration-200 hover:scale-[1.02]"
-          >
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-4">
-                <div class="soft-inset w-12 h-12 rounded-lg flex items-center justify-center">
-                  <span class="font-semibold" style="color: var(--accent);">{index + 1}</span>
-                </div>
-                <div>
-                  <div class="flex items-center space-x-2 mb-1">
-                    <span class="text-sm font-medium" style="color: var(--text-secondary);">
-                      {section.id}
-                    </span>
+    <div class="flex-1 min-w-0 lg:ml-0 ml-0">
+      <div class="mb-6 space-y-4 lg:mt-0 mt-16">
+        <a
+          href="chapters/"
+          class="soft-button inline-flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium"
+          style="color: var(--accent);"
+        >
+          <LucideIcon name="arrow-left" class="h-4 w-4" />
+          <span>返回章节列表</span>
+        </a>
+        <div>
+          <h1 class="text-4xl font-bold mb-2" style="color: var(--text-primary);">
+            第 {chapter.id} 章：{chapter.title}
+          </h1>
+          <p style="color: var(--text-secondary);">共 {chapter.sections.length} 个小节</p>
+        </div>
+      </div>
+
+      <div class="soft-card p-6 md:p-8">
+        {IntroContent ? (
+          <div class="prose prose-lg max-w-none mb-8">
+            <IntroContent />
+          </div>
+        ) : null}
+
+        <div class="space-y-4">
+          {chapter.sections.map((section, index) => (
+            <a
+              href={sectionUrl(chapter.id, section.id)}
+              class="block p-5 md:p-6 soft-raised rounded-xl transition-all duration-200 hover:scale-[1.02]"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                  <div class="soft-inset w-12 h-12 rounded-lg flex items-center justify-center">
+                    <span class="font-semibold" style="color: var(--accent);">{index + 1}</span>
                   </div>
-                  <h3 class="text-lg font-semibold" style="color: var(--text-primary);">
-                    {section.title}
-                  </h3>
+                  <div>
+                    <div class="flex items-center space-x-2 mb-1">
+                      <span class="text-sm font-medium" style="color: var(--text-secondary);">
+                        {section.id}
+                      </span>
+                    </div>
+                    <h3 class="text-lg font-semibold" style="color: var(--text-primary);">
+                      {section.title}
+                    </h3>
+                  </div>
                 </div>
+                <LucideIcon name="chevron-right" class="h-5 w-5" style="color: var(--text-secondary);" />
               </div>
-              <LucideIcon name="chevron-right" class="h-5 w-5" style="color: var(--text-secondary);" />
-            </div>
-          </a>
-        ))}
+            </a>
+          ))}
+        </div>
       </div>
     </div>
   </div>

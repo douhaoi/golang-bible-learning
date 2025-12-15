@@ -1,6 +1,6 @@
 ---
 import type { Chapter } from '@/lib/contentChapters';
-import { sectionUrl } from '@/lib/urls';
+import { chapterUrl, sectionUrl } from '@/lib/urls';
 import LucideIcon from './LucideIcon.astro';
 
 type Props = {
@@ -9,7 +9,7 @@ type Props = {
 };
 
 const { chapters, currentSectionId } = Astro.props;
-const currentChapterId = currentSectionId.split('.')[0] || '';
+const currentChapterId = currentSectionId?.split('.')[0] || '';
 ---
 
 <>
@@ -47,17 +47,19 @@ const currentChapterId = currentSectionId.split('.')[0] || '';
 
       <ul class="space-y-2">
         {chapters.map((chapter) => {
+          const hasIntroActive = currentSectionId === `${chapter.id}.intro` || currentSectionId === `${chapter.id}.0`;
+          const hasSectionActive = chapter.sections.some((s) => s.id === currentSectionId);
           const isExpanded = chapter.id === currentChapterId;
-          const hasCurrentSection = chapter.sections.some((s) => s.id === currentSectionId);
+          const hasCurrent = hasIntroActive || hasSectionActive;
           return (
             <li>
               <button
                 type="button"
                 class:list={[
                   'w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-200',
-                  hasCurrentSection ? 'soft-raised' : 'hover:soft-raised',
+                  hasCurrent ? 'soft-raised' : 'hover:soft-raised',
                 ]}
-                style={`color: ${hasCurrentSection ? 'var(--accent)' : 'var(--text-primary)'};`}
+                style={`color: ${hasCurrent ? 'var(--accent)' : 'var(--text-primary)'};`}
                 data-chapter-toggle={chapter.id}
                 aria-expanded={isExpanded ? 'true' : 'false'}
               >
@@ -80,6 +82,33 @@ const currentChapterId = currentSectionId.split('.')[0] || '';
                 class:list={['mt-1 ml-2 space-y-0.5', isExpanded ? '' : 'hidden']}
                 data-chapter-sections={chapter.id}
               >
+                {chapter.intro ? (
+                  <li>
+                    <a
+                      href={chapterUrl(chapter.id)}
+                      class:list={[
+                        'group flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-200',
+                        hasIntroActive ? 'soft-inset' : 'hover:bg-opacity-50',
+                      ]}
+                      style={`color: ${hasIntroActive ? 'var(--accent)' : 'var(--text-primary)'}; background-color: transparent;`}
+                      data-section-link
+                    >
+                      <div class="flex-1 min-w-0">
+                        <div class="text-xs font-medium truncate">
+                          本章导读
+                        </div>
+                      </div>
+                      <LucideIcon
+                        name="chevron-right"
+                        class:list={[
+                          'h-3 w-3 flex-shrink-0 ml-2 transition-all duration-200',
+                          hasIntroActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
+                        ]}
+                      />
+                    </a>
+                  </li>
+                ) : null}
+
                 {chapter.sections.map((section) => {
                   const isActive = section.id === currentSectionId;
                   return (

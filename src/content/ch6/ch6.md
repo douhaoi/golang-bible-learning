@@ -18,3 +18,56 @@ func (c Celsius) String() string { return fmt.Sprintf("%g°C", c) }
 ```
 
 在本章中，OOP编程的第一方面，我们会向你展示如何有效地定义和使用方法。我们会覆盖到OOP编程的两个关键点，封装和组合。
+
+## TypeScript 对照
+- 方法接收者：`func (p *Point) Move()` 类似 TS class 方法，指针接收者可修改原值；值接收者拷贝。
+- 结构体嵌入：`type T struct { S }` 提供字段/方法提升，类似 TS `extends` 或 mixin 合成。
+- 导出规则：首字母大写即公开，替代 TS 的 `public`/`private` 关键字。
+- 接口满足：方法集取决于接收者类型，指针接收者方法不自动属于值类型。
+
+### 示例：值接收者 vs 指针接收者
+```go
+package main
+
+import "fmt"
+
+type Counter int
+
+func (c *Counter) Inc() { *c++ }
+func (c Counter) Snapshot() Counter { return c }
+
+type Named struct{ Name string }
+type Player struct {
+	Named // 嵌入，提升 Name 字段
+	Counter
+}
+
+func main() {
+	p := Player{Named: Named{Name: "Go"}}
+	p.Inc()
+	fmt.Println(p.Name, p.Snapshot())
+}
+```
+
+```ts
+class Counter {
+  value = 0;
+  inc() { this.value++; }
+  snapshot() { return this.value; }
+}
+
+class Named { constructor(public name: string) {} }
+
+class Player extends Counter {
+  constructor(public named: Named) { super(); }
+}
+
+const p = new Player(new Named("TS"));
+p.inc();
+console.log(p.named.name, p.snapshot());
+```
+
+### 踩坑提醒
+- 指针接收者方法只有 `*T` 拥有，`T` 不自动满足，需要注意接口实现。
+- 结构体嵌入的零值字段可能为 `nil` 指针，调用其方法前需初始化。
+- 方法值/方法表达式捕获接收者，与闭包行为一致，注意并发时的共享状态。
