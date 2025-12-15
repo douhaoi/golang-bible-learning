@@ -20,7 +20,7 @@ if (!chapter) {
   throw new Error(`Chapter not found: ${chapterId}`);
 }
 
-let IntroContent: any = null;
+let IntroContent: astroHTML.JSX.Element | null = null;
 if (chapter.intro) {
   const introEntry = await getEntry('sections', chapter.intro.entryId);
   if (!introEntry) throw new Error(`Intro not found for chapter ${chapter.id}`);
