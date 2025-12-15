@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="book-cover" x1="12" y1="6" x2="52" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8" />
+      <stop offset="1" stop-color="#0EA5E9" />
+    </linearGradient>
+    <linearGradient id="go-mark" x1="20" y1="22" x2="46" y2="42" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ECFEFF" />
+      <stop offset="1" stop-color="#CFFAFE" />
+    </linearGradient>
+  </defs>
+
+  <rect x="4" y="2" width="56" height="60" rx="10" fill="#0F172A" />
+  <path
+    d="M12 8h36c3.3 0 6 2.7 6 6v36c0 2.2-1.8 4-4 4H12c-2.2 0-4-1.8-4-4V12c0-2.2 1.8-4 4-4z"
+    fill="url(#book-cover)"
+    stroke="#22D3EE"
+    stroke-width="2.2"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M18 12h6"
+    stroke="#0F172A"
+    stroke-width="2.8"
+    stroke-linecap="round"
+  />
+  <path
+    d="M18 18h10"
+    stroke="#0F172A"
+    stroke-width="2.8"
+    stroke-linecap="round"
+  />
+  <path
+    d="M18 24h8"
+    stroke="#0F172A"
+    stroke-width="2.8"
+    stroke-linecap="round"
+  />
+
+  <path
+    d="M24 28a7 7 0 1 0 0 14h8"
+    stroke="url(#go-mark)"
+    stroke-width="3.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M24 35h8"
+    stroke="url(#go-mark)"
+    stroke-width="3.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <circle
+    cx="44.5"
+    cy="35"
+    r="7"
+    stroke="url(#go-mark)"
+    stroke-width="3.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M12 33h5"
+    stroke="url(#go-mark)"
+    stroke-width="2"
+    stroke-linecap="round"
+  />
+  <path
+    d="M12 37h4"
+    stroke="url(#go-mark)"
+    stroke-width="2"
+    stroke-linecap="round"
+  />
+</svg>

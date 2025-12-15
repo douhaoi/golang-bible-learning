@@ -10,7 +10,7 @@ const totalSections = chapters.reduce((sum, ch) => sum + ch.sections.length, 0);
 
 <BaseLayout
   title="Go语言圣经"
-  description="一个现代化的Go语言学习平台，基于《Go语言圣经》构建，帮助你系统学习Go语言编程"
+  description="一个现代化的Go语言学习平台，基于《Go语言圣经》构建，面向前端/TypeScript 开发者提供 Go-TS 对照与导读"
 >
   <div class="space-y-12">
     <div class="text-center">
@@ -22,7 +22,7 @@ const totalSections = chapters.reduce((sum, ch) => sum + ch.sections.length, 0);
           The Go Programming Language
         </p>
         <p class="text-lg max-w-2xl mx-auto" style="color: var(--text-secondary);">
-          一个现代化的Go语言学习平台，基于《Go语言圣经》构建，帮助你系统学习Go语言编程
+          一个现代化的Go语言学习平台，基于《Go语言圣经》构建，为前端/TypeScript 开发者提供 Go-TS 概念对照与导读，帮助跨栈学习。
         </p>
       </div>
     </div>
@@ -34,17 +34,60 @@ const totalSections = chapters.reduce((sum, ch) => sum + ch.sections.length, 0);
         { icon: 'zap', value: '100%', label: '免费' },
       ].map((stat) => (
         <div class="soft-card p-6">
-          <div class="flex items-center space-x-4">
-            <div class="soft-raised p-3 rounded-xl">
-              <LucideIcon name={stat.icon as any} class="h-8 w-8" style="color: var(--accent);" />
-            </div>
-            <div>
-              <div class="text-3xl font-bold" style="color: var(--accent);">{stat.value}</div>
-              <div class="text-sm" style="color: var(--text-secondary);">{stat.label}</div>
-            </div>
+        <div class="flex items-center space-x-4">
+          <div class="soft-raised p-3 rounded-xl">
+            <LucideIcon name={stat.icon as any} class="h-8 w-8" style="color: var(--accent);" />
+          </div>
+          <div>
+            <div class="text-3xl font-bold" style="color: var(--accent);">{stat.value}</div>
+            <div class="text-sm" style="color: var(--text-secondary);">{stat.label}</div>
           </div>
         </div>
-      ))}
+      </div>
+    ))}
+  </div>
+
+    <div class="soft-card p-8 md:p-10">
+      <div class="flex items-center space-x-2 mb-6">
+        <div class="soft-raised p-2 rounded-lg">
+          <LucideIcon name="layout-dashboard" class="h-6 w-6" style="color: var(--accent);" />
+        </div>
+        <h2 class="text-3xl font-bold" style="color: var(--text-primary);">站点功能</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {[
+          {
+            icon: 'compare',
+            title: 'Go ↔ TypeScript 对照',
+            desc: '每章提供概念映射、示例与差异提醒。',
+          },
+          {
+            icon: 'map',
+            title: '章节导读与导航',
+            desc: '导读聚焦重点，侧边栏一键跳转小节。',
+          },
+          {
+            icon: 'scale',
+            title: '版权与用途声明',
+            desc: '内容源自《Go语言圣经》中文版，仅供学习交流。',
+          },
+          {
+            icon: 'download',
+            title: '静态构建与快速加载',
+            desc: 'Astro SSG 静态输出，加载快，可离线阅读。',
+          },
+        ].map((item) => (
+          <div class="soft-raised p-5 rounded-xl flex space-x-4 items-start">
+            <div class="soft-inset w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center">
+              <LucideIcon name={item.icon as any} class="h-6 w-6" style="color: var(--accent);" />
+            </div>
+            <div>
+              <h3 class="font-semibold mb-1" style="color: var(--text-primary);">{item.title}</h3>
+              <p class="text-sm leading-relaxed" style="color: var(--text-secondary);">{item.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
 
     <div class="soft-card p-8 md:p-10">
@@ -59,18 +102,18 @@ const totalSections = chapters.reduce((sum, ch) => sum + ch.sections.length, 0);
           {
             icon: 'book-open',
             title: '系统化学习',
-            desc: '从基础到高级，14个章节循序渐进，全面覆盖Go语言核心知识点',
+            desc: '14 章循序渐进，覆盖核心语法与实践。',
           },
-          { icon: 'code', title: '实践导向', desc: '每个章节都包含丰富的示例代码和实际应用场景' },
+          { icon: 'code', title: '实践导向', desc: '示例与场景为主，边读边跑代码。' },
           {
             icon: 'zap',
             title: '现代化界面',
-            desc: '清晰美观的阅读体验，支持响应式设计，随时随地学习',
+            desc: '清晰、响应式的阅读体验，桌面与移动端一致顺畅。',
           },
           {
             icon: 'users',
             title: '开源免费',
-            desc: '完全开源，基于Go语言圣经中文版，仅供学习交流使用',
+            desc: '完全开源，内容用于学习交流。',
           },
         ].map((feature) => (
           <div class="soft-raised p-5 rounded-xl">

@@ -4,14 +4,20 @@ type Props = {
     | 'arrow-left'
     | 'book'
     | 'book-open'
+    | 'go-mark'
+    | 'layout-dashboard'
+    | 'compare'
     | 'chevron-down'
     | 'chevron-left'
     | 'chevron-right'
     | 'code'
+    | 'download'
     | 'home'
     | 'list'
+    | 'map'
     | 'menu'
     | 'moon'
+    | 'scale'
     | 'sparkles'
     | 'sun'
     | 'users'
@@ -31,6 +37,13 @@ const icons: Record<Props['name'], string> = {
     <path d="M4 4.5A2.5 2.5 0 0 1 6.5 7H20" />
     <path d="M20 22V2" />
     <path d="M4 22V2" />
+  `,
+  'go-mark': `
+    <path d="M11 7a5 5 0 1 0 0 10h4" />
+    <path d="M11 12h4" />
+    <circle cx="19" cy="12" r="4" />
+    <path d="M2 10h4" />
+    <path d="M2 14h3" />
   `,
   home: `
     <path d="M9 22V12h6v10" />
@@ -67,6 +80,35 @@ const icons: Record<Props['name'], string> = {
   code: `
     <path d="M16 18l6-6-6-6" />
     <path d="M8 6l-6 6 6 6" />
+  `,
+  'layout-dashboard': `
+    <rect x="3" y="3" width="7" height="9" rx="1" />
+    <rect x="14" y="3" width="7" height="5" rx="1" />
+    <rect x="14" y="12" width="7" height="9" rx="1" />
+    <rect x="3" y="15" width="7" height="6" rx="1" />
+  `,
+  compare: `
+    <path d="M4 10l-2 2 2 2" />
+    <path d="M2 12h10" />
+    <path d="M20 8l2-2-2-2" />
+    <path d="M12 6h10" />
+  `,
+  map: `
+    <path d="M3 7l6-3 6 3 6-3v13l-6 3-6-3-6 3z" />
+    <path d="M9 4v13" />
+    <path d="M15 7v13" />
+  `,
+  scale: `
+    <path d="M12 3v18" />
+    <path d="M5 9h14" />
+    <path d="M4 9l-2 6h6z" />
+    <path d="M20 9l-2 6h6z" />
+  `,
+  download: `
+    <rect x="3" y="4" width="18" height="14" rx="2" />
+    <path d="M12 8v6" />
+    <path d="M9.5 11.5L12 14l2.5-2.5" />
+    <path d="M6 18h12" />
   `,
   sparkles: `
     <path d="M9 3l1.5 3L14 7.5 10.5 9 9 12.5 7.5 9 4 7.5 7.5 6z" />
@@ -126,4 +168,3 @@ const inner = icons[name];
   {title ? <title>{title}</title> : null}
   <Fragment set:html={inner} />
 </svg>
-
